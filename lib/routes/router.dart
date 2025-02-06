@@ -5,6 +5,7 @@ import 'package:creativolabs/screens/about/view/about.dart';
 import 'package:creativolabs/screens/home/view/home.dart';
 import 'package:creativolabs/screens/signin/view/signin.dart';
 import 'package:creativolabs/screens/signup/view/signup.dart';
+import 'package:creativolabs/screens/terms/view/terms.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -48,6 +49,10 @@ final router = GoRouter(
         GoRoute(
           path: '/about',
           builder: (context, state) => const About(),
+        ),
+        GoRoute(
+          path: '/terms',
+          builder: (context, state) => const Terms(),
         ),
       ],
     ),

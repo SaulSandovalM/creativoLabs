@@ -87,10 +87,10 @@ class Footer extends StatelessWidget {
                   ),
                 ],
               ),
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Legales y seguridad',
                     style: TextStyle(
                       color: Colors.black,
@@ -98,24 +98,21 @@ class Footer extends StatelessWidget {
                       fontSize: 14,
                     ),
                   ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Terminos y condiciones',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
+                  const SizedBox(height: 16),
+                  InkWell(
+                    onTap: () {
+                      context.go('/terms');
+                    },
+                    child: const Text(
+                      'Terminos y condiciones',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Politicas de privacidad',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Politica de reembolso',
                     style: TextStyle(
                       color: Colors.black,
