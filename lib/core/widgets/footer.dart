@@ -1,6 +1,7 @@
 import 'package:creativolabs/core/constants/nav_items.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:go_router/go_router.dart';
 
 class Footer extends StatelessWidget {
   const Footer({super.key});
@@ -15,10 +16,10 @@ class Footer extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Información de la plataforma',
                     style: TextStyle(
                       color: Colors.black,
@@ -26,19 +27,24 @@ class Footer extends StatelessWidget {
                       fontSize: 14,
                     ),
                   ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Acerca de',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
+                  const SizedBox(height: 16),
+                  InkWell(
+                    onTap: () {
+                      context.go('/about');
+                    },
+                    child: const Text(
+                      'Acerca de',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Como funciona',
                     style: TextStyle(
-                      color: Colors.grey,
+                      color: Colors.black,
                       fontSize: 14,
                     ),
                   ),
@@ -59,7 +65,7 @@ class Footer extends StatelessWidget {
                   Text(
                     'Explorar oficios',
                     style: TextStyle(
-                      color: Colors.grey,
+                      color: Colors.black,
                       fontSize: 14,
                     ),
                   ),
@@ -67,7 +73,7 @@ class Footer extends StatelessWidget {
                   Text(
                     'Buscar profesionales',
                     style: TextStyle(
-                      color: Colors.grey,
+                      color: Colors.black,
                       fontSize: 14,
                     ),
                   ),
@@ -75,7 +81,7 @@ class Footer extends StatelessWidget {
                   Text(
                     'Soporte y ayuda',
                     style: TextStyle(
-                      color: Colors.grey,
+                      color: Colors.black,
                       fontSize: 14,
                     ),
                   ),
@@ -96,7 +102,7 @@ class Footer extends StatelessWidget {
                   Text(
                     'Terminos y condiciones',
                     style: TextStyle(
-                      color: Colors.grey,
+                      color: Colors.black,
                       fontSize: 14,
                     ),
                   ),
@@ -104,7 +110,7 @@ class Footer extends StatelessWidget {
                   Text(
                     'Politicas de privacidad',
                     style: TextStyle(
-                      color: Colors.grey,
+                      color: Colors.black,
                       fontSize: 14,
                     ),
                   ),
@@ -112,7 +118,7 @@ class Footer extends StatelessWidget {
                   Text(
                     'Politica de reembolso',
                     style: TextStyle(
-                      color: Colors.grey,
+                      color: Colors.black,
                       fontSize: 14,
                     ),
                   ),
@@ -133,14 +139,14 @@ class Footer extends StatelessWidget {
                   const Text(
                     'Correo electronico: creativelabs@gmail.com',
                     style: TextStyle(
-                      color: Colors.grey,
+                      color: Colors.black,
                       fontSize: 14,
                     ),
                   ),
                   const SizedBox(height: 16),
                   const Text(
                     'Telefono: 1234567890',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: Colors.black),
                   ),
                   const SizedBox(height: 16),
                   InkWell(
@@ -165,7 +171,7 @@ class Footer extends StatelessWidget {
               ),
             ],
           ),
-          const Divider(color: Colors.grey, height: 32),
+          const Divider(color: Colors.black, height: 32),
           Column(
             children: [
               Row(
@@ -173,7 +179,7 @@ class Footer extends StatelessWidget {
                 children: [
                   Text(
                     '© ${DateTime.now().year} CreativeLabs. Todos los derechos reservados.',
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    style: const TextStyle(color: Colors.black, fontSize: 12),
                   ),
                   Row(
                     children: [
@@ -181,7 +187,7 @@ class Footer extends StatelessWidget {
                         IconButton(
                           icon: Icon(
                             footerIcons[i],
-                            color: Colors.grey,
+                            color: Colors.black,
                           ),
                           onPressed: () async {
                             final url = socialMediaUrls[i];

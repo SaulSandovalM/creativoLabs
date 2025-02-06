@@ -1,6 +1,10 @@
 import 'package:creativolabs/core/constants/colors.dart';
 import 'package:creativolabs/core/widgets/footer.dart';
+import 'package:creativolabs/core/widgets/header.dart';
+import 'package:creativolabs/screens/about/view/about.dart';
 import 'package:creativolabs/screens/home/view/home.dart';
+import 'package:creativolabs/screens/signin/view/signin.dart';
+import 'package:creativolabs/screens/signup/view/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -10,34 +14,10 @@ final router = GoRouter(
     ShellRoute(
       builder: (context, state, child) {
         return Scaffold(
-          appBar: AppBar(
-            backgroundColor: CustomColor.navBarBg,
-            title: Image.asset(
-              'assets/images/logo.png',
-              height: 40,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {},
-                child: const Text(
-                  "Regístrate",
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              const SizedBox(width: 10), // Espaciado
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.amber, // Color llamativo
-                ),
-                child: const Text("Iniciar sesión"),
-              ),
-              const SizedBox(width: 10),
-            ],
-            elevation: 4,
-          ),
+          backgroundColor: CustomColor.navBarBg,
           body: Column(
             children: [
+              const Header(),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -56,6 +36,18 @@ final router = GoRouter(
         GoRoute(
           path: '/',
           builder: (context, state) => const Home(),
+        ),
+        GoRoute(
+          path: '/signin',
+          builder: (context, state) => const SignIn(),
+        ),
+        GoRoute(
+          path: '/signup',
+          builder: (context, state) => const SignUp(),
+        ),
+        GoRoute(
+          path: '/about',
+          builder: (context, state) => const About(),
         ),
       ],
     ),

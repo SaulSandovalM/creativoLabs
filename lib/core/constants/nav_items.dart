@@ -4,7 +4,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 List<String> navTitles = [
   'Inicio',
   'Servicios',
-  'Contacto',
 ];
 
 List<String> navRoutes = [

@@ -1,4 +1,4 @@
-import 'package:creativolabs/core/constants/nav_items.dart';
+import 'package:creativolabs/core/constants/colors.dart';
 import 'package:creativolabs/core/widgets/site_logo.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -9,29 +9,43 @@ class Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: SizedBox(
-        height: 60,
-        width: double.maxFinite,
-        child: Row(children: [
-          SiteLogo(
-            onTap: () {},
-          ),
-          const Spacer(),
-          for (int i = 0; i < navTitles.length; i++)
-            Padding(
-              padding: const EdgeInsets.only(right: 20),
-              child: TextButton(
-                onPressed: () => context.go(navRoutes[i]),
-                child: Text(
-                  navTitles[i],
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                  ),
-                ),
+      child: Container(
+        color: CustomColor.navBarBg,
+        child: SizedBox(
+          height: 60,
+          width: double.maxFinite,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SiteLogo(
+                onTap: () {
+                  context.go('/');
+                },
               ),
-            )
-        ]),
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.person),
+                offset: const Offset(0, 50),
+                onSelected: (String result) {
+                  if (result == 'signin') {
+                    context.go('/signin');
+                  } else if (result == 'signup') {
+                    context.go('/signup');
+                  }
+                },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  const PopupMenuItem<String>(
+                    value: 'signin',
+                    child: Text('Iniciar sesión'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'signup',
+                    child: Text('Registrarse'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
