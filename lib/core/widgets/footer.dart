@@ -50,10 +50,10 @@ class Footer extends StatelessWidget {
                   ),
                 ],
               ),
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Enlaces utiles',
                     style: TextStyle(
                       color: Colors.black,
@@ -61,28 +61,38 @@ class Footer extends StatelessWidget {
                       fontSize: 14,
                     ),
                   ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Explorar oficios',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
+                  const SizedBox(height: 16),
+                  InkWell(
+                    onTap: () {
+                      context.go('/services');
+                    },
+                    child: const Text(
+                      'Explorar oficios',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Buscar profesionales',
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 14,
                     ),
                   ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Soporte y ayuda',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
+                  const SizedBox(height: 16),
+                  InkWell(
+                    onTap: () {
+                      context.go('/contact');
+                    },
+                    child: const Text(
+                      'Soporte y ayuda',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ],
@@ -112,11 +122,16 @@ class Footer extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Politica de reembolso',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
+                  InkWell(
+                    onTap: () {
+                      context.go('/politics');
+                    },
+                    child: const Text(
+                      'Politica de reembolso',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ],
@@ -142,13 +157,13 @@ class Footer extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    'Telefono: 1234567890',
+                    'Telefono: 7714407842',
                     style: TextStyle(color: Colors.black),
                   ),
                   const SizedBox(height: 16),
                   InkWell(
                     onTap: () async {
-                      const url = 'https://wa.me/7711895701';
+                      const url = 'https://wa.me/7714407842';
                       if (await canLaunchUrl(Uri.parse(url))) {
                         await launchUrl(Uri.parse(url));
                       } else {

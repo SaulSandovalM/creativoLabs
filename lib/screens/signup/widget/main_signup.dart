@@ -1,6 +1,9 @@
 import 'package:creativolabs/core/constants/colors.dart';
 import 'package:creativolabs/core/widgets/container.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class MainSignUp extends StatefulWidget {
   final double headerHeight;
@@ -13,6 +16,32 @@ class MainSignUp extends StatefulWidget {
 
 class MainSignUpState extends State<MainSignUp> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<void> _register() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        await _auth.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registro exitoso.')),
+        );
+        context.go('/profile');
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +85,7 @@ class MainSignUpState extends State<MainSignUp> {
                               children: [
                                 Expanded(
                                   child: TextFormField(
+                                    controller: _nameController,
                                     decoration: const InputDecoration(
                                       labelText: 'Nombre',
                                       border: OutlineInputBorder(),
@@ -71,6 +101,7 @@ class MainSignUpState extends State<MainSignUp> {
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: TextFormField(
+                                    controller: _lastNameController,
                                     decoration: const InputDecoration(
                                       labelText: 'Apellido',
                                       border: OutlineInputBorder(),
@@ -87,6 +118,7 @@ class MainSignUpState extends State<MainSignUp> {
                             ),
                             const SizedBox(height: 40),
                             TextFormField(
+                              controller: _emailController,
                               decoration: const InputDecoration(
                                 labelText: 'Correo electrónico',
                                 border: OutlineInputBorder(),
@@ -100,6 +132,7 @@ class MainSignUpState extends State<MainSignUp> {
                             ),
                             const SizedBox(height: 40),
                             TextFormField(
+                              controller: _passwordController,
                               obscureText: true,
                               decoration: const InputDecoration(
                                 labelText: 'Contraseña',
@@ -123,7 +156,9 @@ class MainSignUpState extends State<MainSignUp> {
                                       children: [
                                         const Text("Ya tienes una cuenta?"),
                                         TextButton(
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            context.go('/signin');
+                                          },
                                           child: const Text(
                                             "Entra  .",
                                             style: TextStyle(
@@ -142,17 +177,7 @@ class MainSignUpState extends State<MainSignUp> {
                                           vertical: 15,
                                         ),
                                       ),
-                                      onPressed: () {
-                                        if (_formKey.currentState!.validate()) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content:
-                                                  Text('Procesando datos...'),
-                                            ),
-                                          );
-                                        }
-                                      },
+                                      onPressed: _register,
                                       child: const Text("Registrate"),
                                     ),
                                   ],
@@ -160,17 +185,22 @@ class MainSignUpState extends State<MainSignUp> {
                                 const SizedBox(height: 20),
                                 RichText(
                                   textAlign: TextAlign.center,
-                                  text: const TextSpan(
-                                    style: TextStyle(color: Colors.grey),
+                                  text: TextSpan(
+                                    style: const TextStyle(color: Colors.grey),
                                     children: [
-                                      TextSpan(
+                                      const TextSpan(
                                         text:
                                             'Al hacer clic en "Registrate", aceptas los',
                                       ),
                                       TextSpan(
                                         text:
                                             ' términos y condiciones de nuestra empresa.',
-                                        style: TextStyle(color: Colors.blue),
+                                        style:
+                                            const TextStyle(color: Colors.blue),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            context.go('/terms');
+                                          },
                                       ),
                                     ],
                                   ),

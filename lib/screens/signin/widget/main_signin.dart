@@ -1,5 +1,7 @@
 import 'package:creativolabs/core/constants/colors.dart';
 import 'package:creativolabs/core/widgets/container.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 
 class MainSignIn extends StatefulWidget {
@@ -13,6 +15,31 @@ class MainSignIn extends StatefulWidget {
 
 class MainSignInState extends State<MainSignIn> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  bool _isLoading = false;
+
+  Future<void> _signIn() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
+      try {
+        await _auth.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+        if (!mounted) return;
+        context.go('/profile');
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      } finally {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +85,7 @@ class MainSignInState extends State<MainSignIn> {
                           children: [
                             const SizedBox(height: 40),
                             TextFormField(
+                              controller: _emailController,
                               decoration: const InputDecoration(
                                 labelText: 'Correo electrónico',
                                 border: OutlineInputBorder(),
@@ -83,6 +111,7 @@ class MainSignInState extends State<MainSignIn> {
                             ),
                             const SizedBox(height: 10),
                             TextFormField(
+                              controller: _passwordController,
                               obscureText: true,
                               decoration: const InputDecoration(
                                 labelText: 'Contraseña',
@@ -104,14 +133,16 @@ class MainSignInState extends State<MainSignIn> {
                                   children: [
                                     Row(
                                       children: [
-                                        const Text("Aun no tienes una cuenta?"),
+                                        const Text(
+                                          "¿Aún no tienes una cuenta?",
+                                        ),
                                         TextButton(
-                                          onPressed: () {},
+                                          onPressed: () =>
+                                              context.go('/signup'),
                                           child: const Text(
-                                            "Registrate aqui.",
-                                            style: TextStyle(
-                                              color: Colors.blue,
-                                            ),
+                                            "Regístrate aquí.",
+                                            style:
+                                                TextStyle(color: Colors.blue),
                                           ),
                                         ),
                                       ],
@@ -125,18 +156,12 @@ class MainSignInState extends State<MainSignIn> {
                                           vertical: 15,
                                         ),
                                       ),
-                                      onPressed: () {
-                                        if (_formKey.currentState!.validate()) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content:
-                                                  Text('Procesando datos...'),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                      child: const Text("Entrar"),
+                                      onPressed: _isLoading ? null : _signIn,
+                                      child: _isLoading
+                                          ? const CircularProgressIndicator(
+                                              color: Colors.white,
+                                            )
+                                          : const Text("Entrar"),
                                     ),
                                   ],
                                 ),
