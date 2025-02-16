@@ -30,7 +30,7 @@ class MainSignInState extends State<MainSignIn> {
         );
         if (!mounted) return;
         context.go('/profile');
-      } catch (e) {
+      } on FirebaseAuthException catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: ${e.toString()}')),

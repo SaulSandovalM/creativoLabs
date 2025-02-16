@@ -91,6 +91,13 @@ final router = GoRouter(
       ],
     ),
   ],
+  errorPageBuilder: (context, state) => MaterialPage(
+    child: Scaffold(
+      body: Center(
+        child: Text('Page not found: ${state.uri}'),
+      ),
+    ),
+  ),
 );
 
 String? _requireAuth() {
