@@ -1,9 +1,10 @@
 import 'package:creativolabs/core/constants/colors.dart';
 import 'package:creativolabs/core/widgets/footer.dart';
-import 'package:creativolabs/core/widgets/header.dart';
+import 'package:creativolabs/core/widgets/site_logo.dart';
 import 'package:creativolabs/screens/about/view/about.dart';
 import 'package:creativolabs/screens/authwrapper/view/authwrapper.dart';
 import 'package:creativolabs/screens/contact/view/contact.dart';
+import 'package:creativolabs/screens/dashboard/view/dashboard.dart';
 import 'package:creativolabs/screens/home/view/home.dart';
 import 'package:creativolabs/screens/politics/view/politics.dart';
 import 'package:creativolabs/screens/profile/view/profile.dart';
@@ -31,11 +32,103 @@ final router = GoRouter(
   routes: [
     ShellRoute(
       builder: (context, state, child) {
+        final user = FirebaseAuth.instance.currentUser;
+
         return Scaffold(
           backgroundColor: CustomColor.navBarBg,
+          appBar: AppBar(
+            backgroundColor: CustomColor.navBarBg,
+            elevation: 0,
+            leading: user != null
+                ? Builder(
+                    builder: (context) => IconButton(
+                      icon: const Icon(Icons.menu),
+                      onPressed: () {
+                        Scaffold.of(context).openDrawer();
+                      },
+                    ),
+                  )
+                : null,
+            title: SizedBox(
+              height: 60,
+              width: double.maxFinite,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SiteLogo(
+                    onTap: () {
+                      context.go('/');
+                    },
+                  ),
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.person),
+                    offset: const Offset(0, 50),
+                    onSelected: (String result) async {
+                      final ctx = context;
+                      if (result == 'signin') {
+                        ctx.go('/signin');
+                      } else if (result == 'signup') {
+                        ctx.go('/signup');
+                      } else if (result == 'signout') {
+                        await FirebaseAuth.instance.signOut();
+                        if (!ctx.mounted) return;
+                        ctx.go('/signin');
+                      }
+                    },
+                    itemBuilder: (BuildContext context) {
+                      if (user != null) {
+                        return <PopupMenuEntry<String>>[
+                          const PopupMenuItem<String>(
+                            value: 'signout',
+                            child: Text('Cerrar sesión'),
+                          ),
+                        ];
+                      } else {
+                        return <PopupMenuEntry<String>>[
+                          const PopupMenuItem<String>(
+                            value: 'signin',
+                            child: Text('Iniciar sesión'),
+                          ),
+                          const PopupMenuItem<String>(
+                            value: 'signup',
+                            child: Text('Registrarse'),
+                          ),
+                        ];
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          drawer:
+              user != null // Solo mostrar el Drawer si el usuario está logueado
+                  ? Drawer(
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        children: [
+                          const DrawerHeader(
+                            child: Text('Menu'),
+                          ),
+                          ListTile(
+                            title: const Text('Profile'),
+                            onTap: () {
+                              context.go('/profile');
+                            },
+                          ),
+                          ListTile(
+                            title: const Text('Dashboard'),
+                            onTap: () {
+                              context.go('/dashboard');
+                            },
+                          ),
+                          // Otras opciones del Drawer
+                        ],
+                      ),
+                    )
+                  : null, // Si no está logueado, no mostrar el Drawer
           body: Column(
             children: [
-              const Header(),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -90,7 +183,7 @@ final router = GoRouter(
         ),
         GoRoute(
           path: '/dashboard',
-          builder: (context, state) => const Profile(),
+          builder: (context, state) => const Dashboard(),
           redirect: (context, state) => _requireAuth(),
         ),
       ],

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:portafolio/core/constants/colors.dart';
 
 class SiteLogo extends StatelessWidget {
   const SiteLogo({
@@ -20,6 +19,7 @@ class SiteLogo extends StatelessWidget {
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
+            fontSize: 16,
           ),
         ),
       ),

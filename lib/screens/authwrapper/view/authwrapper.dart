@@ -1,4 +1,4 @@
-import 'package:creativolabs/screens/profile/view/profile.dart';
+import 'package:creativolabs/screens/dashboard/view/dashboard.dart';
 import 'package:creativolabs/screens/signin/view/signin.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +17,7 @@ class AuthWrapper extends StatelessWidget {
           );
         }
         if (snapshot.hasData) {
-          return const Profile();
+          return const Dashboard();
         } else {
           return const SignIn();
         }
