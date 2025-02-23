@@ -21,24 +21,54 @@ class MainSignInState extends State<MainSignIn> {
   bool _isLoading = false;
 
   Future<void> _signIn() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
-      try {
-        await _auth.signInWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
-        if (!mounted) return;
-        context.go('/profile');
-      } on FirebaseAuthException catch (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
-      } finally {
-        setState(() => _isLoading = false);
-      }
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      if (!mounted) return;
+      context.go('/dashboard');
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      _showAuthError(e.code);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  void _showAuthError(String errorCode) {
+    final errorMessages = {
+      'invalid-email': 'El correo electrónico no es válido.',
+      'invalid-credential': 'Las credenciales no son válidas.',
+      'user-disabled': 'El usuario ha sido deshabilitado.',
+      'user-not-found': 'No se encontró un usuario con ese correo.',
+      'wrong-password': 'La contraseña es incorrecta.',
+    };
+
+    final errorMessage = errorMessages[errorCode] ??
+        'Ocurrió un error: $errorCode. Inténtalo de nuevo.';
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: $errorMessage')),
+    );
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Ingresa tu correo';
+    }
+    final RegExp emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    if (!emailRegex.hasMatch(value)) {
+      return 'Ingresa un correo electrónico válido';
+    }
+    return null;
   }
 
   @override
@@ -90,12 +120,7 @@ class MainSignInState extends State<MainSignIn> {
                                 labelText: 'Correo electrónico',
                                 border: OutlineInputBorder(),
                               ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Ingresa tu correo';
-                                }
-                                return null;
-                              },
+                              validator: _validateEmail,
                             ),
                             const SizedBox(height: 20),
                             const Row(
@@ -118,8 +143,8 @@ class MainSignInState extends State<MainSignIn> {
                                 border: OutlineInputBorder(),
                               ),
                               validator: (value) {
-                                if (value == null || value.length < 6) {
-                                  return 'Mínimo 6 caracteres';
+                                if (value == null || value.isEmpty) {
+                                  return 'Ingresa tu contraseña';
                                 }
                                 return null;
                               },

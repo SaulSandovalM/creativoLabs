@@ -88,6 +88,11 @@ final router = GoRouter(
           builder: (context, state) => const Profile(),
           redirect: (context, state) => _requireAuth(),
         ),
+        GoRoute(
+          path: '/dashboard',
+          builder: (context, state) => const Profile(),
+          redirect: (context, state) => _requireAuth(),
+        ),
       ],
     ),
   ],
