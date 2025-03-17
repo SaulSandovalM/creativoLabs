@@ -101,32 +101,32 @@ final router = GoRouter(
               ),
             ),
           ),
-          drawer:
-              user != null // Solo mostrar el Drawer si el usuario está logueado
-                  ? Drawer(
-                      child: ListView(
-                        padding: EdgeInsets.zero,
-                        children: [
-                          const DrawerHeader(
-                            child: Text('Menu'),
-                          ),
-                          ListTile(
-                            title: const Text('Profile'),
-                            onTap: () {
-                              context.go('/profile');
-                            },
-                          ),
-                          ListTile(
-                            title: const Text('Dashboard'),
-                            onTap: () {
-                              context.go('/dashboard');
-                            },
-                          ),
-                          // Otras opciones del Drawer
-                        ],
+          drawer: user != null
+              ? Drawer(
+                  child: ListView(
+                    padding: EdgeInsets.zero,
+                    children: [
+                      const DrawerHeader(
+                        child: Text('Menu'),
                       ),
-                    )
-                  : null, // Si no está logueado, no mostrar el Drawer
+                      ListTile(
+                        leading: const Icon(Icons.dashboard),
+                        title: const Text('Dashboard'),
+                        onTap: () {
+                          context.go('/dashboard');
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.person),
+                        title: const Text('Profile'),
+                        onTap: () {
+                          context.go('/profile');
+                        },
+                      ),
+                    ],
+                  ),
+                )
+              : null,
           body: Column(
             children: [
               Expanded(
