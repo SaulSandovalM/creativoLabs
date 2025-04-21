@@ -14,6 +14,7 @@ import 'package:creativolabs/screens/terms/view/terms.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -33,7 +34,6 @@ final router = GoRouter(
     ShellRoute(
       builder: (context, state, child) {
         final user = FirebaseAuth.instance.currentUser;
-
         return Scaffold(
           backgroundColor: CustomColor.navBarBg,
           appBar: AppBar(
@@ -60,42 +60,104 @@ final router = GoRouter(
                       context.go('/');
                     },
                   ),
-                  PopupMenuButton<String>(
-                    icon: const Icon(Icons.person),
-                    offset: const Offset(0, 50),
-                    onSelected: (String result) async {
-                      final ctx = context;
-                      if (result == 'signin') {
-                        ctx.go('/signin');
-                      } else if (result == 'signup') {
-                        ctx.go('/signup');
-                      } else if (result == 'signout') {
-                        await FirebaseAuth.instance.signOut();
-                        if (!ctx.mounted) return;
-                        ctx.go('/signin');
-                      }
-                    },
-                    itemBuilder: (BuildContext context) {
-                      if (user != null) {
-                        return <PopupMenuEntry<String>>[
-                          const PopupMenuItem<String>(
-                            value: 'signout',
-                            child: Text('Cerrar sesión'),
+                  Row(
+                    children: [
+                      if (user != null)
+                        Text(
+                          DateFormat("dd 'de' MMMM yyyy", 'es')
+                              .format(DateTime.now()),
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
                           ),
-                        ];
-                      } else {
-                        return <PopupMenuEntry<String>>[
-                          const PopupMenuItem<String>(
-                            value: 'signin',
-                            child: Text('Iniciar sesión'),
-                          ),
-                          const PopupMenuItem<String>(
-                            value: 'signup',
-                            child: Text('Registrarse'),
-                          ),
-                        ];
-                      }
-                    },
+                        ),
+                      if (user != null)
+                        IconButton(
+                          icon: const Icon(Icons.notifications),
+                          onPressed: () {
+                            showMenu(
+                              context: context,
+                              position:
+                                  const RelativeRect.fromLTRB(100, 60, 0, 0),
+                              items: [
+                                PopupMenuItem(
+                                  child: ListTile(
+                                    leading: const Icon(
+                                        Icons.notification_important),
+                                    title: const Text('Notificación 1'),
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  child: ListTile(
+                                    leading: const Icon(
+                                        Icons.notification_important),
+                                    title: const Text('Notificación 2'),
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  child: ListTile(
+                                    leading: const Icon(
+                                        Icons.notification_important),
+                                    title: const Text('Notificación 3'),
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      PopupMenuButton<String>(
+                        icon: const Icon(Icons.person),
+                        offset: const Offset(0, 50),
+                        onSelected: (String result) async {
+                          final ctx = context;
+                          if (result == 'signin') {
+                            ctx.go('/signin');
+                          } else if (result == 'signup') {
+                            ctx.go('/signup');
+                          } else if (result == 'profile') {
+                            ctx.go('/profile');
+                          } else if (result == 'signout') {
+                            await FirebaseAuth.instance.signOut();
+                            if (!ctx.mounted) return;
+                            ctx.go('/signin');
+                          }
+                        },
+                        itemBuilder: (BuildContext context) {
+                          if (user != null) {
+                            return <PopupMenuEntry<String>>[
+                              const PopupMenuItem<String>(
+                                value: 'profile',
+                                child: Text('Perfil'),
+                              ),
+                              const PopupMenuItem<String>(
+                                value: 'signout',
+                                child: Text('Cerrar sesión'),
+                              ),
+                            ];
+                          } else {
+                            return <PopupMenuEntry<String>>[
+                              const PopupMenuItem<String>(
+                                value: 'signin',
+                                child: Text('Iniciar sesión'),
+                              ),
+                              const PopupMenuItem<String>(
+                                value: 'signup',
+                                child: Text('Registrarse'),
+                              ),
+                            ];
+                          }
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -110,17 +172,180 @@ final router = GoRouter(
                         child: Text('Menu'),
                       ),
                       ListTile(
-                        leading: const Icon(Icons.dashboard),
-                        title: const Text('Dashboard'),
+                        leading: Icon(
+                          Icons.dashboard,
+                          color: GoRouter.of(context)
+                                      .routerDelegate
+                                      .currentConfiguration
+                                      .fullPath ==
+                                  '/dashboard'
+                              ? Colors.white
+                              : Colors.black,
+                        ),
+                        title: Text(
+                          'Inicio',
+                          style: TextStyle(
+                            color: GoRouter.of(context)
+                                        .routerDelegate
+                                        .currentConfiguration
+                                        .fullPath ==
+                                    '/dashboard'
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
+                        selected: GoRouter.of(context)
+                                .routerDelegate
+                                .currentConfiguration
+                                .fullPath ==
+                            '/dashboard',
+                        selectedTileColor: Colors.blue,
                         onTap: () {
                           context.go('/dashboard');
                         },
                       ),
                       ListTile(
-                        leading: const Icon(Icons.person),
-                        title: const Text('Profile'),
+                        leading: const Icon(Icons.attach_money),
+                        title: Text(
+                          'Ventas',
+                          style: TextStyle(
+                            color: GoRouter.of(context)
+                                        .routerDelegate
+                                        .currentConfiguration
+                                        .fullPath ==
+                                    '/ventas'
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
+                        selected: GoRouter.of(context)
+                                .routerDelegate
+                                .currentConfiguration
+                                .fullPath ==
+                            '/ventas',
+                        selectedTileColor: Colors.grey.shade200,
                         onTap: () {
-                          context.go('/profile');
+                          context.go('/ventas');
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.person),
+                        title: Text(
+                          'Clientes',
+                          style: TextStyle(
+                            color: GoRouter.of(context)
+                                        .routerDelegate
+                                        .currentConfiguration
+                                        .fullPath ==
+                                    '/clientes'
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
+                        selected: GoRouter.of(context)
+                                .routerDelegate
+                                .currentConfiguration
+                                .fullPath ==
+                            '/clientes',
+                        selectedTileColor: Colors.grey.shade200,
+                        onTap: () {
+                          context.go('/clientes');
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.list_alt),
+                        title: Text(
+                          'Inventario',
+                          style: TextStyle(
+                            color: GoRouter.of(context)
+                                        .routerDelegate
+                                        .currentConfiguration
+                                        .fullPath ==
+                                    '/inventario'
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
+                        selected: GoRouter.of(context)
+                                .routerDelegate
+                                .currentConfiguration
+                                .fullPath ==
+                            '/inventario',
+                        selectedTileColor: Colors.grey.shade200,
+                        onTap: () {
+                          context.go('/inventario');
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.trending_up),
+                        title: Text(
+                          'Finanzas',
+                          style: TextStyle(
+                            color: GoRouter.of(context)
+                                        .routerDelegate
+                                        .currentConfiguration
+                                        .fullPath ==
+                                    '/finanzas'
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
+                        selected: GoRouter.of(context)
+                                .routerDelegate
+                                .currentConfiguration
+                                .fullPath ==
+                            '/finanzas',
+                        selectedTileColor: Colors.grey.shade200,
+                        onTap: () {
+                          context.go('/finanzas');
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.group),
+                        title: Text(
+                          'Empleados',
+                          style: TextStyle(
+                            color: GoRouter.of(context)
+                                        .routerDelegate
+                                        .currentConfiguration
+                                        .fullPath ==
+                                    '/empleados'
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
+                        selected: GoRouter.of(context)
+                                .routerDelegate
+                                .currentConfiguration
+                                .fullPath ==
+                            '/empleados',
+                        selectedTileColor: Colors.grey.shade200,
+                        onTap: () {
+                          context.go('/empleados');
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.settings),
+                        title: Text(
+                          'Configuración',
+                          style: TextStyle(
+                            color: GoRouter.of(context)
+                                        .routerDelegate
+                                        .currentConfiguration
+                                        .fullPath ==
+                                    '/configuracion'
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
+                        selected: GoRouter.of(context)
+                                .routerDelegate
+                                .currentConfiguration
+                                .fullPath ==
+                            '/configuracion',
+                        selectedTileColor: Colors.grey.shade200,
+                        onTap: () {
+                          context.go('/configuracion');
                         },
                       ),
                     ],

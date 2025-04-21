@@ -1,5 +1,6 @@
+import 'package:creativolabs/core/utils/colors.dart';
+// import 'package:creativolabs/screens/dashboard/widget/line_chart.dart';
 import 'package:flutter/material.dart';
-// import 'package:line_chart/line_chart.dart';
 
 class OverviewStatistic extends StatefulWidget {
   const OverviewStatistic({
@@ -12,6 +13,7 @@ class OverviewStatistic extends StatefulWidget {
 
 class _OverviewStatisticState extends State<OverviewStatistic> {
   final List<String> _times = ['1D', '1W', '1M', '1Y', 'MAX'];
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -92,7 +94,7 @@ class _OverviewStatisticState extends State<OverviewStatistic> {
                       const Text(
                         'Origin Game EA Inc. (OREA)',
                         style: TextStyle(
-                          color: Color(0xFF6B6B6B),
+                          color: primaryColor,
                           fontSize: 12.0,
                         ),
                       ),
@@ -111,7 +113,7 @@ class _OverviewStatisticState extends State<OverviewStatistic> {
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall!
-                                    .copyWith(color: const Color(0xFF6B6B6B)),
+                                    .copyWith(color: primaryColor),
                               ),
                               SizedBox(
                                 width:
