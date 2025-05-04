@@ -13,7 +13,7 @@ class CustomColor {
   // New Colors
   static const Color scaffoldBg = Color(0xff0d1116);
 
-  static const Color navBarBg = Color(0xffd1d3d4);
+  static const Color navBarBg = Color(0xfffaf9f7);
   static const Color navBorder = Color(0xff57505f);
 
   static const Color navText = Color(0xffeaeaeb);

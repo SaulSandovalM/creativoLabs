@@ -8,6 +8,8 @@ import 'package:creativolabs/screens/dashboard/view/dashboard.dart';
 import 'package:creativolabs/screens/home/view/home.dart';
 import 'package:creativolabs/screens/politics/view/politics.dart';
 import 'package:creativolabs/screens/profile/view/profile.dart';
+import 'package:creativolabs/screens/sales/view/create_sale.dart';
+import 'package:creativolabs/screens/sales/view/sales.dart';
 import 'package:creativolabs/screens/signin/view/signin.dart';
 import 'package:creativolabs/screens/signup/view/signup.dart';
 import 'package:creativolabs/screens/terms/view/terms.dart';
@@ -205,7 +207,16 @@ final router = GoRouter(
                         },
                       ),
                       ListTile(
-                        leading: const Icon(Icons.attach_money),
+                        leading: Icon(
+                          Icons.attach_money,
+                          color: GoRouter.of(context)
+                                      .routerDelegate
+                                      .currentConfiguration
+                                      .fullPath ==
+                                  '/sales'
+                              ? Colors.white
+                              : Colors.black,
+                        ),
                         title: Text(
                           'Ventas',
                           style: TextStyle(
@@ -213,7 +224,7 @@ final router = GoRouter(
                                         .routerDelegate
                                         .currentConfiguration
                                         .fullPath ==
-                                    '/ventas'
+                                    '/sales'
                                 ? Colors.white
                                 : Colors.black,
                           ),
@@ -222,10 +233,10 @@ final router = GoRouter(
                                 .routerDelegate
                                 .currentConfiguration
                                 .fullPath ==
-                            '/ventas',
-                        selectedTileColor: Colors.grey.shade200,
+                            '/sales',
+                        selectedTileColor: Colors.blue,
                         onTap: () {
-                          context.go('/ventas');
+                          context.go('/sales');
                         },
                       ),
                       ListTile(
@@ -409,6 +420,16 @@ final router = GoRouter(
         GoRoute(
           path: '/dashboard',
           builder: (context, state) => const Dashboard(),
+          redirect: (context, state) => _requireAuth(),
+        ),
+        GoRoute(
+          path: '/sales',
+          builder: (context, state) => const Sales(),
+          redirect: (context, state) => _requireAuth(),
+        ),
+        GoRoute(
+          path: '/create-order',
+          builder: (context, state) => const CreateSales(),
           redirect: (context, state) => _requireAuth(),
         ),
       ],
