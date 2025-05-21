@@ -1,10 +1,10 @@
 import 'package:creativolabs/core/widgets/container.dart';
-import 'package:creativolabs/screens/sales/widget/main_sales.dart';
+import 'package:creativolabs/screens/customers/widget/main_customers.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class Sales extends StatelessWidget {
-  const Sales({super.key});
+class Customers extends StatelessWidget {
+  const Customers({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class Sales extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Órdenes',
+                'Clientes',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 30,
@@ -24,7 +24,7 @@ class Sales extends StatelessWidget {
               ),
               ElevatedButton.icon(
                 onPressed: () {
-                  context.go('/create-sales');
+                  context.go('/create-customer');
                 },
                 icon: Icon(Icons.add),
                 label: Text('Agregar'),
@@ -36,7 +36,7 @@ class Sales extends StatelessWidget {
               ),
             ],
           ),
-          MainSales(headerHeight: 60),
+          MainCustomers(headerHeight: 60),
           SizedBox(height: 40),
         ],
       ),

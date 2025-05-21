@@ -1,7 +1,14 @@
-import 'package:creativolabs/core/constants/colors.dart';
-import 'package:creativolabs/core/widgets/container.dart';
-import 'package:go_router/go_router.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:creativolabs/services/service_service.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+String formatDate(dynamic date) {
+  if (date is Timestamp) {
+    date = date.toDate();
+  }
+  return DateFormat('dd MMMM', 'es').format(date);
+}
 
 class MainService extends StatefulWidget {
   final double headerHeight;
@@ -13,149 +20,85 @@ class MainService extends StatefulWidget {
 }
 
 class MainServiceState extends State<MainService> {
-  final _formKey = GlobalKey<FormState>();
+  final ServiceService _serviceService = ServiceService();
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double availableHeight = screenHeight - widget.headerHeight;
-
-    return MainContainer(
-      child: SizedBox(
-        height: availableHeight,
-        width: double.infinity,
-        child: Row(
-          children: [
-            Expanded(
-              child: Container(
-                color: CustomColor.navBarBg,
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'INICIA SESIÓN',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      const Text(
-                        'Bienvenido de nuevo',
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const Text(
-                        'Inicie sesión para administrar su cuenta.',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Form(
-                        key: _formKey,
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 40),
-                            TextFormField(
-                              decoration: const InputDecoration(
-                                labelText: 'Correo electrónico',
-                                border: OutlineInputBorder(),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Ingresa tu correo';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(
-                                  'Olvidaste tu contraseña?',
-                                  style: TextStyle(
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            TextFormField(
-                              obscureText: true,
-                              decoration: const InputDecoration(
-                                labelText: 'Contraseña',
-                                border: OutlineInputBorder(),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.length < 6) {
-                                  return 'Mínimo 6 caracteres';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 40),
-                            Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Text("Aun no tienes una cuenta?"),
-                                        TextButton(
-                                          onPressed: () {
-                                            context.go('/signup');
-                                          },
-                                          child: const Text(
-                                            "Registrate aqui.",
-                                            style: TextStyle(
-                                              color: Colors.blue,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.blue,
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 40,
-                                          vertical: 15,
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        if (_formKey.currentState!.validate()) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content:
-                                                  Text('Procesando datos...'),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                      child: const Text("Entrar"),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+    return SizedBox(
+      width: double.infinity,
+      child: StreamBuilder<QuerySnapshot>(
+        stream: _serviceService.getServiceStreamByBusiness('bus_456'),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final docs = snapshot.data!.docs;
+          final services =
+              docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+          return PaginatedDataTable(
+            columns: const [
+              DataColumn(label: Text('Servicio')),
+              DataColumn(label: Text('Precio')),
+              DataColumn(label: Text('')),
+            ],
+            source: _OrderDataSource(services),
+            rowsPerPage: 10,
+          );
+        },
       ),
     );
   }
+}
+
+class _OrderDataSource extends DataTableSource {
+  final List<Map<String, dynamic>> services;
+
+  _OrderDataSource(this.services);
+
+  @override
+  DataRow? getRow(int index) {
+    if (index >= services.length) return null;
+    final order = services[index];
+    return DataRow(cells: [
+      DataCell(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(order['name'] ?? 'Sin nombre'),
+          ],
+        ),
+      ),
+      DataCell(
+        Text(
+          order['price'] != null
+              ? '\$${order['price'].toStringAsFixed(2)}'
+              : 'Sin precio',
+          style: TextStyle(
+            fontSize: 12,
+            color: Color(0xff667085),
+          ),
+        ),
+      ),
+      DataCell(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Icon(Icons.edit, color: Colors.green),
+            SizedBox(width: 10),
+            Icon(Icons.delete, color: Colors.red),
+          ],
+        ),
+      ),
+    ]);
+  }
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get rowCount => services.length;
+
+  @override
+  int get selectedRowCount => 0;
 }

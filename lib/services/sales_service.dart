@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class OrderService {
-  final CollectionReference ordersRef =
+class SalesService {
+  final CollectionReference salesRef =
       FirebaseFirestore.instance.collection('orders');
 
   // Obtener órdenes de un cliente específico
-  Future<List<QueryDocumentSnapshot>> getOrdersByCustomer(
+  Future<List<QueryDocumentSnapshot>> getSalesByCustomer(
       String customerId) async {
-    QuerySnapshot snapshot = await ordersRef
+    QuerySnapshot snapshot = await salesRef
         .where('customerId', isEqualTo: customerId)
         .orderBy('createdAt', descending: true)
         .get();
@@ -15,8 +15,8 @@ class OrderService {
   }
 
   // Obtener órdenes de un negocio específico
-  Stream<QuerySnapshot> getOrdersStreamByBusiness(String businessId) {
-    return ordersRef
+  Stream<QuerySnapshot> getSalesStreamByBusiness(String businessId) {
+    return salesRef
         .where('businessId', isEqualTo: businessId)
         .orderBy('createdAt', descending: true)
         .limit(10)
@@ -24,9 +24,9 @@ class OrderService {
   }
 
   // Obtener órdenes de un negocio filtradas por estado
-  Future<List<QueryDocumentSnapshot>> getOrdersByBusinessAndStatus(
+  Future<List<QueryDocumentSnapshot>> getSalesByBusinessAndStatus(
       String businessId, String status) async {
-    QuerySnapshot snapshot = await ordersRef
+    QuerySnapshot snapshot = await salesRef
         .where('businessId', isEqualTo: businessId)
         .where('status', isEqualTo: status)
         .orderBy('createdAt', descending: true)
@@ -35,10 +35,23 @@ class OrderService {
   }
 
   // Stream en tiempo real para un cliente
-  Stream<QuerySnapshot> getOrdersStreamByCustomer(String customerId) {
-    return ordersRef
+  Stream<QuerySnapshot> getSalesStreamByCustomer(String customerId) {
+    return salesRef
         .where('customerId', isEqualTo: customerId)
         .orderBy('createdAt', descending: true)
         .snapshots();
+  }
+
+  // Obtiene el número de la última orden registrada en la colección 'Seles'.
+  // Si no hay órdenes, devuelve 1 como número inicial.
+  Future<int> getLastSalesNumber() async {
+    QuerySnapshot snapshot =
+        await salesRef.orderBy('orderNumber', descending: true).limit(1).get();
+    if (snapshot.docs.isNotEmpty) {
+      final lastOrder = snapshot.docs.first;
+      return (lastOrder['orderNumber'] ?? 0) + 1;
+    } else {
+      return 1;
+    }
   }
 }

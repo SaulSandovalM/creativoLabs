@@ -4,12 +4,17 @@ import 'package:creativolabs/core/widgets/site_logo.dart';
 import 'package:creativolabs/screens/about/view/about.dart';
 import 'package:creativolabs/screens/authwrapper/view/authwrapper.dart';
 import 'package:creativolabs/screens/contact/view/contact.dart';
+import 'package:creativolabs/screens/customers/view/create_customer.dart';
+import 'package:creativolabs/screens/customers/view/customers.dart';
+import 'package:creativolabs/screens/customers/view/detail_customer.dart';
 import 'package:creativolabs/screens/dashboard/view/dashboard.dart';
 import 'package:creativolabs/screens/home/view/home.dart';
 import 'package:creativolabs/screens/politics/view/politics.dart';
 import 'package:creativolabs/screens/profile/view/profile.dart';
 import 'package:creativolabs/screens/sales/view/create_sale.dart';
 import 'package:creativolabs/screens/sales/view/sales.dart';
+import 'package:creativolabs/screens/service/view/create_service.dart';
+import 'package:creativolabs/screens/service/view/service.dart';
 import 'package:creativolabs/screens/signin/view/signin.dart';
 import 'package:creativolabs/screens/signup/view/signup.dart';
 import 'package:creativolabs/screens/terms/view/terms.dart';
@@ -240,15 +245,24 @@ final router = GoRouter(
                         },
                       ),
                       ListTile(
-                        leading: const Icon(Icons.person),
+                        leading: Icon(
+                          Icons.receipt,
+                          color: GoRouter.of(context)
+                                      .routerDelegate
+                                      .currentConfiguration
+                                      .fullPath ==
+                                  '/services'
+                              ? Colors.white
+                              : Colors.black,
+                        ),
                         title: Text(
-                          'Clientes',
+                          'Servicios',
                           style: TextStyle(
                             color: GoRouter.of(context)
                                         .routerDelegate
                                         .currentConfiguration
                                         .fullPath ==
-                                    '/clientes'
+                                    '/servcies'
                                 ? Colors.white
                                 : Colors.black,
                           ),
@@ -257,10 +271,34 @@ final router = GoRouter(
                                 .routerDelegate
                                 .currentConfiguration
                                 .fullPath ==
-                            '/clientes',
+                            '/services',
+                        selectedTileColor: Colors.blue,
+                        onTap: () {
+                          context.go('/services');
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.person),
+                        title: Text(
+                          'Clientes',
+                          style: TextStyle(
+                            color: GoRouter.of(context)
+                                        .routerDelegate
+                                        .currentConfiguration
+                                        .fullPath ==
+                                    '/customers'
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
+                        selected: GoRouter.of(context)
+                                .routerDelegate
+                                .currentConfiguration
+                                .fullPath ==
+                            '/customers',
                         selectedTileColor: Colors.grey.shade200,
                         onTap: () {
-                          context.go('/clientes');
+                          context.go('/customers');
                         },
                       ),
                       ListTile(
@@ -428,8 +466,34 @@ final router = GoRouter(
           redirect: (context, state) => _requireAuth(),
         ),
         GoRoute(
-          path: '/create-order',
+          path: '/create-sales',
           builder: (context, state) => const CreateSales(),
+          redirect: (context, state) => _requireAuth(),
+        ),
+        GoRoute(
+          path: '/services',
+          builder: (context, state) => const Service(),
+          redirect: (context, state) => _requireAuth(),
+        ),
+        GoRoute(
+          path: '/create-service',
+          builder: (context, state) => const CreateService(),
+          redirect: (context, state) => _requireAuth(),
+        ),
+        GoRoute(
+          path: '/customers',
+          builder: (context, state) => const Customers(),
+          redirect: (context, state) => _requireAuth(),
+        ),
+        GoRoute(
+          path: '/create-customer',
+          builder: (context, state) => const CreateCustomer(),
+          redirect: (context, state) => _requireAuth(),
+        ),
+        GoRoute(
+          path: '/detail-customer/:customerId',
+          builder: (context, state) =>
+              DetailCustomer(id: state.pathParameters['customerId']!),
           redirect: (context, state) => _requireAuth(),
         ),
       ],

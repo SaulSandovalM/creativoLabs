@@ -1,4 +1,5 @@
-import 'package:creativolabs/services/cliente_service.dart';
+import 'package:creativolabs/services/customers_service.dart';
+import 'package:creativolabs/services/sales_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
@@ -51,10 +52,13 @@ class _MainCreateSaleState extends State<MainCreateSale> {
   String? clienteSeleccionado;
   String? estadoSeleccionado;
   String? dropdownValue;
+  String numeroOrden = '';
 
-  final ClienteService _clienteService = ClienteService();
+  final CustomersService _customersService = CustomersService();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
+  final TextEditingController _orderNumberController = TextEditingController();
+  final SalesService _salesService = SalesService();
 
   String formatDate(DateTime date) {
     return DateFormat('dd MMMM yyyy', 'es').format(date);
@@ -75,20 +79,32 @@ class _MainCreateSaleState extends State<MainCreateSale> {
     }
   }
 
+  Future<void> _generarNumeroOrden() async {
+    int nextOrderNumber = await _salesService.getLastSalesNumber();
+    setState(() {
+      _orderNumberController.text = nextOrderNumber.toString();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     _cargarClientes();
+    _generarNumeroOrden();
   }
 
   Future<void> _cargarClientes() async {
     try {
-      final clientesList = await _clienteService.getCustomers();
-      setState(() {
-        clientes = clientesList;
-        if (clientes.isNotEmpty) {
-          clienteSeleccionado = clientes.first;
-        }
+      final stream = _customersService.getCustomersStreamByBusiness('bus_456');
+      stream.listen((snapshot) {
+        final List<String> clientesList =
+            snapshot.docs.map((doc) => doc['name'] as String).toList();
+        setState(() {
+          clientes = clientesList;
+          if (clientes.isNotEmpty) {
+            clienteSeleccionado = clientes.first;
+          }
+        });
       });
     } catch (e) {
       debugPrint('Error al cargar clientes: $e');
@@ -153,16 +169,12 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                         const SizedBox(width: 25),
                         Expanded(
                           child: TextFormField(
+                            controller: _orderNumberController,
+                            readOnly: true,
                             decoration: const InputDecoration(
                               labelText: 'Orden',
                               border: OutlineInputBorder(),
                             ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Por favor ingrese un valor';
-                              }
-                              return null;
-                            },
                           ),
                         ),
                       ],
@@ -296,6 +308,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                             keyboardType: TextInputType.number,
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(5),
                             ],
                             decoration: const InputDecoration(
                               labelText: 'CP',
