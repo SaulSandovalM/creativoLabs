@@ -1,4 +1,6 @@
+import 'package:creativolabs/core/widgets/custom_card.dart';
 import 'package:creativolabs/core/widgets/container.dart';
+import 'package:creativolabs/screens/customers/widget/main_detail_customer.dart';
 import 'package:creativolabs/services/customers_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -52,72 +54,332 @@ class DetailCustomer extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 20),
+              MainDetailCustomer(customer: customer),
+              SizedBox(height: 20),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      // Imagen de perfil
-                      CircleAvatar(
-                        radius: 35,
-                        backgroundImage: NetworkImage(
-                          'https://via.placeholder.com/150', // Aquí ponga su URL real o use AssetImage si la tiene local
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      // Nombre, estado y correo
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            customer['name'] ?? 'Sin nombre',
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      children: [
+                        CustomCard(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Chip(
-                                label: const Text('Activo'),
-                                backgroundColor: Colors.green.shade50,
-                                avatar: const Icon(Icons.check_circle,
-                                    color: Colors.teal, size: 18),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Material(
+                                        color: Colors.white,
+                                        shape: const CircleBorder(),
+                                        elevation: 4,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(6),
+                                          child: Icon(
+                                            Icons.person_outlined,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 20),
+                                      Text(
+                                        'Detalles basicos',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Icon(Icons.edit_outlined),
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              Text(
+                                'Nombre',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFF667085),
                                 ),
-                                labelStyle:
-                                    const TextStyle(color: Colors.black87),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                customer['name'],
+                                style: TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Divider(),
+                              SizedBox(height: 10),
+                              Text(
+                                'Correo',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFF667085),
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                customer['email'],
+                                style: TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Divider(),
+                              SizedBox(height: 10),
+                              Text(
+                                'Teléfono',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFF667085),
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                customer['phoneNumber'] != null
+                                    ? customer['phoneNumber'].toString()
+                                    : 'Sin telefono',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Divider(),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        CustomCard(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Material(
+                                        color: Colors.white,
+                                        shape: const CircleBorder(),
+                                        elevation: 4,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(6),
+                                          child: Icon(
+                                            Icons.security,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 20),
+                                      Text(
+                                        'Seguridad',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 20),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: () {},
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color.fromARGB(
+                                              255, 255, 0, 0),
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 16),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                          textStyle:
+                                              const TextStyle(fontSize: 16),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Text('Eliminar cuenta'),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(height: 20),
+                                      Text(
+                                        'Un cliente eliminado no se puede recuperar. Todos los datos se eliminarán permanentemente.',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFF667085),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'miron.vitold@dominio.com',
-                            style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: CustomCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Row(
+                                children: [
+                                  Material(
+                                    color: Colors.white,
+                                    shape: const CircleBorder(),
+                                    elevation: 4,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(6),
+                                      child: Icon(
+                                        Icons.shopping_cart_outlined,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 20),
+                                  Text(
+                                    'Pagos',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  context.go('/customers');
+                                },
+                                icon: const Icon(Icons.add),
+                                label: const Text('Agregar pago'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                  elevation: 0,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.grey, // Color del borde
+                                width: 1, // Grosor del borde
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'PEDIDOS TOTALES',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Color(0xFF667085),
+                                      ),
+                                    ),
+                                    Text(
+                                      '5',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'VALOR DE LOS PEDIDOS',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Color(0xFF667085),
+                                      ),
+                                    ),
+                                    Text(
+                                      '\$ 1,254',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      'REEMBOLSOS',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Color(0xFF667085),
+                                      ),
+                                    ),
+                                    Text(
+                                      '\$ 1,254',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          SizedBox(
+                            width: double.infinity,
+                            child: DataTable(
+                              columns: const [
+                                DataColumn(label: Text('Precio')),
+                                DataColumn(label: Text('Estatus')),
+                                DataColumn(label: Text('Id')),
+                                DataColumn(label: Text('Fecha')),
+                              ],
+                              rows: [
+                                DataRow(
+                                  cells: [
+                                    DataCell(Text('\$1,254')),
+                                    DataCell(Text('Pagado')),
+                                    DataCell(Text('123456')),
+                                    DataCell(Text('21/05/2025')),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                  // Botón de acción
-                  ElevatedButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.arrow_drop_down),
-                    label: const Text('Acción'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          const Color(0xFF6A5BFF), // Morado vibrante
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      textStyle: const TextStyle(fontSize: 16),
                     ),
-                  ),
+                  )
                 ],
               ),
               SizedBox(height: 40),
