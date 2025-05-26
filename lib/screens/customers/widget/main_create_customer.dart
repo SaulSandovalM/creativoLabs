@@ -1,5 +1,7 @@
+import 'package:creativolabs/services/customers_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
 class MainCreateCustomer extends StatefulWidget {
   const MainCreateCustomer({super.key});
@@ -47,6 +49,66 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
     'Zacatecas'
   ];
 
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _companyController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _cpController = TextEditingController();
+
+  final CustomersService _customersService = CustomersService();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _companyController.dispose();
+    _cityController.dispose();
+    _addressController.dispose();
+    _cpController.dispose();
+    super.dispose();
+  }
+
+  Future<void> saveCustomer() async {
+    if (_formKey.currentState!.validate()) {
+      await _customersService.addCustomerWithAddress(
+        customerData: {
+          'businessId': 'your_business_id',
+          'name': _nameController.text,
+          'email': _emailController.text,
+          'phoneNumber': _phoneController.text,
+          'company': _companyController.text,
+          'status': 'activo',
+        },
+        addressData: {
+          'estado': estadoSeleccionado,
+          'ciudad': _cityController.text,
+          'direccion': _addressController.text,
+          'cp': _cpController.text,
+          'principal': true,
+        },
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cliente guardado correctamente')),
+      );
+      _formKey.currentState!.reset();
+      _nameController.clear();
+      _emailController.clear();
+      _phoneController.clear();
+      _companyController.clear();
+      _cityController.clear();
+      _addressController.clear();
+      _cpController.clear();
+      setState(() {
+        estadoSeleccionado = null;
+      });
+      context.go('/customers');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -70,6 +132,7 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
                 children: [
                   Expanded(
                     child: TextFormField(
+                      controller: _nameController,
                       decoration: const InputDecoration(
                         labelText: 'Nombre',
                         border: OutlineInputBorder(),
@@ -85,6 +148,7 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
                   const SizedBox(width: 25),
                   Expanded(
                     child: TextFormField(
+                      controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
                         labelText: 'Correo Electronico',
@@ -112,6 +176,7 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
                 children: [
                   Expanded(
                     child: TextFormField(
+                      controller: _phoneController,
                       keyboardType: TextInputType.number,
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly,
@@ -135,6 +200,7 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
                   const SizedBox(width: 25),
                   Expanded(
                     child: TextFormField(
+                      controller: _companyController,
                       decoration: const InputDecoration(
                         labelText: 'Compañia',
                         border: OutlineInputBorder(),
@@ -187,6 +253,7 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
                   const SizedBox(width: 25),
                   Expanded(
                     child: TextFormField(
+                      controller: _cityController,
                       decoration: const InputDecoration(
                         labelText: 'Ciudad',
                         border: OutlineInputBorder(),
@@ -206,6 +273,7 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
                 children: [
                   Expanded(
                     child: TextFormField(
+                      controller: _addressController,
                       decoration: const InputDecoration(
                         labelText: 'Dirección',
                         border: OutlineInputBorder(),
@@ -221,6 +289,7 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
                   const SizedBox(width: 25),
                   Expanded(
                     child: TextFormField(
+                      controller: _cpController,
                       keyboardType: TextInputType.number,
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly,
@@ -243,10 +312,32 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
                   ),
                 ],
               ),
-              Divider(
-                color: Colors.grey,
-                thickness: 1,
-                height: 40,
+              SizedBox(height: 25),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      await saveCustomer();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      textStyle: const TextStyle(fontSize: 16),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('Guardar cliente'),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
