@@ -30,11 +30,11 @@ final router = GoRouter(
     final isAuthPage =
         state.uri.toString() == '/signin' || state.uri.toString() == '/signup';
     if (user == null && !isAuthPage) {
-      return '/signin';
+      return '/home';
     }
-    if (user != null && isAuthPage) {
-      return '/profile';
-    }
+    // if (user != null && isAuthPage) {
+    //   return '/profile';
+    // }
     return null;
   },
   routes: [

@@ -1,5 +1,6 @@
 import 'package:creativolabs/core/constants/colors.dart';
 import 'package:creativolabs/core/widgets/container.dart';
+import 'package:creativolabs/services/business_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -21,19 +22,35 @@ class MainSignUpState extends State<MainSignUp> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final BusinessService _businessService = BusinessService();
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       try {
-        await _auth.createUserWithEmailAndPassword(
+        // Crear usuario
+        UserCredential userCredential =
+            await _auth.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
+
+        final String userId = userCredential.user!.uid;
+
+        // Llamar a la función de creación del negocio
+        await _businessService.createBusinessForUser(
+          userId: userId,
+          nombre: _nameController.text.trim(),
+          apellido: _lastNameController.text.trim(),
+          email: _emailController.text.trim(),
+        );
+
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registro exitoso.')),
+          const SnackBar(
+            content: Text('Registro y negocio creados correctamente.'),
+          ),
         );
-        context.go('/profile');
+        context.go('/dashboard');
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
