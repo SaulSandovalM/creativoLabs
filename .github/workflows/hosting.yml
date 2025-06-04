@@ -16,16 +16,19 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.24.5' 
+        channel: stable
+        flutter-version-file: pubspec.yaml
+        
+    - run: flutter --version
 
     - name: Create .env file
       run: echo "${{ secrets.ENV_FILE }}" > .env
+
+    - name: Copy .env to web directory
+      run: cp .env web/.env
       
     - name: Install dependencies
       run: flutter pub get
-
-    - name: 🔍 Print .env
-      run: cat .env
 
     - name: Build Flutter Web
       run: flutter build web --release
