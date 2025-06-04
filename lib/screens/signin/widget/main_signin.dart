@@ -156,22 +156,7 @@ class MainSignInState extends State<MainSignIn> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Row(
-                                      children: [
-                                        const Text(
-                                          "¿Aún no tienes una cuenta?",
-                                        ),
-                                        TextButton(
-                                          onPressed: () =>
-                                              context.go('/signup'),
-                                          child: const Text(
-                                            "Regístrate aquí.",
-                                            style:
-                                                TextStyle(color: Colors.blue),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    SizedBox(width: 10),
                                     ElevatedButton(
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.blue,

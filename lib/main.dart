@@ -1,4 +1,5 @@
 import 'package:creativolabs/firebase_options.dart';
+import 'package:creativolabs/providers/business_model.dart';
 import 'package:creativolabs/routes/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,14 +18,11 @@ void main() async {
   await initializeDateFormatting('es', null);
   usePathUrlStrategy();
   runApp(
-      // MultiProvider(
-      //   providers: [
-      //     ChangeNotifierProvider(create: (_) => CourseProvider()),
-      //     ChangeNotifierProvider(create: (_) => ConferencesProvider()),
-      //   ],
-      //   child: const MyApp(),
-      // ),
-      const MyApp());
+    ChangeNotifierProvider(
+      create: (context) => BusinessModel(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

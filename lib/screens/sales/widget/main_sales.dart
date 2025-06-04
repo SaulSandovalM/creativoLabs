@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:creativolabs/services/sales_service.dart';
+import 'package:creativolabs/api/sales_service.dart';
+import 'package:creativolabs/providers/business_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 String formatDate(dynamic date) {
   if (date is Timestamp) {
@@ -10,31 +12,40 @@ String formatDate(dynamic date) {
   return DateFormat('dd MMMM', 'es').format(date);
 }
 
-class MainSales extends StatefulWidget {
+class MainSales extends StatelessWidget {
   final double headerHeight;
 
   const MainSales({super.key, required this.headerHeight});
 
   @override
-  MainSalesState createState() => MainSalesState();
-}
-
-class MainSalesState extends State<MainSales> {
-  final SalesService _salesService = SalesService();
-
-  @override
   Widget build(BuildContext context) {
+    final businessId = context.watch<BusinessModel>().businessId;
+
+    debugPrint('Business ID: $businessId');
+
+    if (businessId == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final salesService = SalesService();
+
     return SizedBox(
       width: double.infinity,
       child: StreamBuilder<QuerySnapshot>(
-        stream: _salesService.getSalesStreamByBusiness('bus_456'),
+        stream: salesService.getSalesStreamByBusiness(businessId),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('No hay información'));
+          }
+
           final docs = snapshot.data!.docs;
           final sales =
               docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+
           return PaginatedDataTable(
             columns: const [
               DataColumn(label: Text('Fecha')),
@@ -69,15 +80,10 @@ class _OrderDataSource extends DataTableSource {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(order['orderNumber'] != null
-                ? order['orderNumber'].toString()
-                : 'Sin número'),
+            Text(order['orderNumber']?.toString() ?? 'Sin número'),
             Text(
-              (order['serviceName'] +
-                      ' - ' +
-                      '\$${order['price'].toStringAsFixed(2)}' ??
-                  'Sin servicio'),
-              style: TextStyle(
+              '${order['serviceName']} - \$${(order['price'] ?? 0).toStringAsFixed(2)}',
+              style: const TextStyle(
                 fontSize: 12,
                 color: Color(0xff667085),
               ),
@@ -86,13 +92,7 @@ class _OrderDataSource extends DataTableSource {
         ),
       ),
       DataCell(Text(order['paymentMethod'] ?? 'Sin método')),
-      DataCell(
-        Row(
-          children: [
-            Text(order['customerName'] ?? 'Sin cliente'),
-          ],
-        ),
-      ),
+      DataCell(Text(order['customerName'] ?? 'Sin cliente')),
       DataCell(
         Row(
           children: [
@@ -113,7 +113,7 @@ class _OrderDataSource extends DataTableSource {
           ],
         ),
       ),
-      DataCell(
+      const DataCell(
         Icon(Icons.remove_red_eye_outlined, color: Colors.black),
       ),
     ]);

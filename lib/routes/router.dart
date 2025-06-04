@@ -156,10 +156,6 @@ final router = GoRouter(
                                 value: 'signin',
                                 child: Text('Iniciar sesión'),
                               ),
-                              const PopupMenuItem<String>(
-                                value: 'signup',
-                                child: Text('Registrarse'),
-                              ),
                             ];
                           }
                         },
@@ -223,7 +219,7 @@ final router = GoRouter(
                               : Colors.black,
                         ),
                         title: Text(
-                          'Ventas',
+                          'Ordenes',
                           style: TextStyle(
                             color: GoRouter.of(context)
                                         .routerDelegate

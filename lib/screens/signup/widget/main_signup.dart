@@ -1,6 +1,6 @@
 import 'package:creativolabs/core/constants/colors.dart';
 import 'package:creativolabs/core/widgets/container.dart';
-import 'package:creativolabs/services/business_service.dart';
+import 'package:creativolabs/api/business_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -39,8 +39,8 @@ class MainSignUpState extends State<MainSignUp> {
         // Llamar a la función de creación del negocio
         await _businessService.createBusinessForUser(
           userId: userId,
-          nombre: _nameController.text.trim(),
-          apellido: _lastNameController.text.trim(),
+          name: _nameController.text.trim(),
+          lastName: _lastNameController.text.trim(),
           email: _emailController.text.trim(),
         );
 

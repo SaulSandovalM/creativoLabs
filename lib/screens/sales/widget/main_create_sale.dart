@@ -1,5 +1,5 @@
-import 'package:creativolabs/services/customers_service.dart';
-import 'package:creativolabs/services/sales_service.dart';
+import 'package:creativolabs/api/customers_service.dart';
+import 'package:creativolabs/api/sales_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
