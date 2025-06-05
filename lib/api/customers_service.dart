@@ -30,22 +30,32 @@ class CustomersService {
 
   // Crear un nuevo cliente y dirección
   Future<void> addCustomerWithAddress({
+    required String businessId,
     required Map<String, dynamic> customerData,
     required Map<String, dynamic> addressData,
   }) async {
-    final customerRef = customersRef;
+    try {
+      // Referencia a la colección de clientes bajo un negocio específico
+      final customerRef = FirebaseFirestore.instance
+          .collection('business')
+          .doc(businessId)
+          .collection('customers');
 
-    // 1. Crear el cliente
-    final nuevoCliente = await customerRef.add({
-      ...customerData,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+      // 1. Crear el cliente
+      final nuevoCliente = await customerRef.add({
+        ...customerData,
+        'businessId': businessId, // Útil para consultas
+        'createdAt': FieldValue.serverTimestamp(),
+      });
 
-    // 2. Crear dirección como subcolección del nuevo cliente
-    await nuevoCliente.collection('direcciones').add({
-      ...addressData,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+      // 2. Crear dirección como subcolección del nuevo cliente
+      await nuevoCliente.collection('addresses').add({
+        ...addressData,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      rethrow;
+    }
   }
 
   // Agregar una dirección a un cliente existente

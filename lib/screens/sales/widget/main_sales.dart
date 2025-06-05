@@ -22,19 +22,15 @@ class MainSales extends StatefulWidget {
 }
 
 class _MainSalesState extends State<MainSales> {
-  bool _initialized = false;
-
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    if (!_initialized) {
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       final businessModel = Provider.of<BusinessModel>(context, listen: false);
       if (businessModel.businessId == null) {
         businessModel.fetchBusinessId();
       }
-      _initialized = true;
-    }
+    });
   }
 
   @override

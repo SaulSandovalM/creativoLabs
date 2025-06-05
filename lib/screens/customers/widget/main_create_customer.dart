@@ -2,6 +2,8 @@ import 'package:creativolabs/api/customers_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:creativolabs/providers/business_model.dart';
 
 class MainCreateCustomer extends StatefulWidget {
   const MainCreateCustomer({super.key});
@@ -73,9 +75,19 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
 
   Future<void> saveCustomer() async {
     if (_formKey.currentState!.validate()) {
+      final businessId =
+          Provider.of<BusinessModel>(context, listen: false).businessId;
+      debugPrint('Business ID: $businessId');
+      if (businessId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se ha cargado el negocio actual')),
+        );
+        return;
+      }
       await _customersService.addCustomerWithAddress(
+        businessId: businessId,
         customerData: {
-          'businessId': 'your_business_id',
+          'businessId': businessId,
           'name': _nameController.text,
           'email': _emailController.text,
           'phoneNumber': _phoneController.text,

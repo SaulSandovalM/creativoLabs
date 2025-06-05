@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:creativolabs/api/customers_service.dart';
+import 'package:creativolabs/providers/business_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 String formatDate(dynamic date) {
   if (date is Timestamp) {
@@ -21,24 +23,42 @@ class MainCustomers extends StatefulWidget {
 }
 
 class MainCustomersState extends State<MainCustomers> {
-  final CustomersService _customersService = CustomersService();
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final businessModel = Provider.of<BusinessModel>(context, listen: false);
+      if (businessModel.businessId == null) {
+        businessModel.fetchBusinessId();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final businessModel = context.watch<BusinessModel>();
+    final businessId = businessModel.businessId;
+
+    if (businessModel.isLoading || businessId == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final customersService = CustomersService();
+
     return SizedBox(
       width: double.infinity,
       child: StreamBuilder<QuerySnapshot>(
-        stream: _customersService.getCustomersStreamByBusiness('bus_456'),
+        stream: customersService.getCustomersStreamByBusiness(businessId),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('No hay información'));
+          }
           final docs = snapshot.data!.docs;
-          final customers = docs.map((doc) {
-            final data = doc.data() as Map<String, dynamic>;
-            data['id'] = doc.id;
-            return data;
-          }).toList();
+          final customers =
+              docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
           return PaginatedDataTable(
             columns: const [
               DataColumn(label: Text('Nombre')),

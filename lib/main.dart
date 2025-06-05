@@ -27,8 +27,13 @@ class MyAppWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => BusinessModel()),
-        // ChangeNotifierProvider(create: (_) => UserModel()),
+        ChangeNotifierProvider(
+          create: (_) {
+            final model = BusinessModel();
+            model.fetchBusinessId();
+            return model;
+          },
+        ),
       ],
       child: const MyApp(),
     );
