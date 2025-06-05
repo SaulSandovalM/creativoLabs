@@ -1,5 +1,5 @@
 import 'package:creativolabs/api/customers_service.dart';
-// import 'package:creativolabs/api/sales_service.dart';
+import 'package:creativolabs/api/sales_service.dart';
 import 'package:creativolabs/providers/business_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -14,114 +14,6 @@ class MainCreateSale extends StatefulWidget {
 }
 
 class _MainCreateSaleState extends State<MainCreateSale> {
-  // final _formKey = GlobalKey<FormState>();
-  // final CustomersService _customersService = CustomersService();
-  // final SalesService _salesService = SalesService();
-
-  // String? clienteSeleccionado;
-  // String? estadoSeleccionado;
-  // String? dropdownValue;
-  // String numeroOrden = '';
-
-  // List<String> clientes = [];
-  // final List<String> estados = [
-  //   'Aguascalientes',
-  //   'Baja California',
-  //   'Baja California Sur',
-  //   'Campeche',
-  //   'Chiapas',
-  //   'Chihuahua',
-  //   'Ciudad de México',
-  //   'Coahuila',
-  //   'Colima',
-  //   'Durango',
-  //   'Estado de México',
-  //   'Guanajuato',
-  //   'Guerrero',
-  //   'Hidalgo',
-  //   'Jalisco',
-  //   'Michoacán',
-  //   'Morelos',
-  //   'Nayarit',
-  //   'Nuevo León',
-  //   'Oaxaca',
-  //   'Puebla',
-  //   'Querétaro',
-  //   'Quintana Roo',
-  //   'San Luis Potosí',
-  //   'Sinaloa',
-  //   'Sonora',
-  //   'Tabasco',
-  //   'Tamaulipas',
-  //   'Tlaxcala',
-  //   'Veracruz',
-  //   'Yucatán',
-  //   'Zacatecas'
-  // ];
-
-  // String formatDate(DateTime date) {
-  //   return DateFormat('dd MMMM yyyy', 'es').format(date);
-  // }
-
-  // final TextEditingController _dateController = TextEditingController();
-  // final TextEditingController _timeController = TextEditingController();
-  // final TextEditingController _orderNumberController = TextEditingController();
-
-  // Future<void> _selectDate(BuildContext context) async {
-  //   final DateTime? selectedDate = await showDatePicker(
-  //     context: context,
-  //     initialDate: DateTime.now(),
-  //     firstDate: DateTime(1900),
-  //     lastDate: DateTime(2100),
-  //     locale: const Locale('es', 'ES'),
-  //   );
-
-  //   if (selectedDate != null) {
-  //     _dateController.text = formatDate(selectedDate);
-
-  // _dateController.text = "${selectedDate.toLocal()}".split(' ')[0];
-  // _dateController.text = formatDate(selectedDate);
-  //   }
-  // }
-
-  // Future<void> _generarNumeroOrden() async {
-  //   int nextOrderNumber = await _salesService.getLastSalesNumber();
-  //   setState(() {
-  //     _orderNumberController.text = nextOrderNumber.toString();
-  //   });
-  // }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _cargarClientes();
-  //   _generarNumeroOrden();
-  // }
-
-  // Future<void> _cargarClientes() async {
-  //   try {
-  //     final stream = _customersService.getCustomersStreamByBusiness('bus_456');
-  //     stream.listen((snapshot) {
-  //       final List<String> clientesList =
-  //           snapshot.docs.map((doc) => doc['name'] as String).toList();
-  //       setState(() {
-  //         clientes = clientesList;
-  //         if (clientes.isNotEmpty) {
-  //           clienteSeleccionado = clientes.first;
-  //         }
-  //       });
-  //     });
-  //   } catch (e) {
-  //     debugPrint('Error al cargar clientes: $e');
-  //   }
-  // }
-
-  // @override
-  // void dispose() {
-  //   _timeController.dispose();
-  //   super.dispose();
-  // }
-
   final _formKey = GlobalKey<FormState>();
 
   List<String> clientes = [];
@@ -176,7 +68,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
   final TextEditingController _shippingController = TextEditingController();
 
   final CustomersService _customersService = CustomersService();
-  // final SalesService _salesService = SalesService();
+  final SalesService _salesService = SalesService();
 
   double subtotal = 1000.0;
   double total = 0.0;
@@ -184,8 +76,10 @@ class _MainCreateSaleState extends State<MainCreateSale> {
   @override
   void initState() {
     super.initState();
+    final model = Provider.of<BusinessModel>(context, listen: false);
+    businessId = model.businessId;
     _cargarClientes();
-    // _generarNumeroOrden();
+    _generarNumeroOrden();
   }
 
   Future<void> _cargarClientes() async {
@@ -218,15 +112,14 @@ class _MainCreateSaleState extends State<MainCreateSale> {
     }
   }
 
-  // Future<void> _generarNumeroOrden() async {
-  //   if (businessId == null) return;
-  //   debugPrint('Business ID: $businessId');
-  //   int nextOrderNumber = await _salesService.getLastSalesNumber(businessId!);
-  //   // debugPrint('Next order number: $nextOrderNumber');
-  //   setState(() {
-  //     _orderNumberController.text = nextOrderNumber.toString();
-  //   });
-  // }
+  Future<void> _generarNumeroOrden() async {
+    if (businessId == null) return;
+    int nextOrderNumber = await _salesService.getLastSalesNumber(businessId!);
+    debugPrint('Next order number: $nextOrderNumber');
+    setState(() {
+      _orderNumberController.text = nextOrderNumber.toString();
+    });
+  }
 
   String formatDate(DateTime date) {
     return DateFormat('dd MMMM yyyy', 'es').format(date);
