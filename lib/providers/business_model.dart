@@ -3,24 +3,35 @@ import 'package:flutter/material.dart';
 
 class BusinessModel with ChangeNotifier {
   String? _businessId;
-  bool _isLoading = true;
+  bool _isLoading = false;
 
   String? get businessId => _businessId;
   bool get isLoading => _isLoading;
 
   final BusinessService _businessService = BusinessService();
 
-  // Método para obtener el businessId de Firebase
+  /// Obtiene el businessId desde el servicio y actualiza el estado
   Future<void> fetchBusinessId() async {
-    final id = await _businessService.getBusinessIdByUser();
-    if (id != null) {
-      _businessId = id;
-      debugPrint('Business ID fetched: $_businessId');
-      notifyListeners();
+    _isLoading = true;
+    notifyListeners(); // Notifica antes de cargar (útil para mostrar loaders)
+
+    try {
+      final id = await _businessService.getBusinessIdByUser();
+      if (id != null) {
+        _businessId = id;
+        debugPrint('Business ID fetched: $_businessId');
+      } else {
+        debugPrint('No se encontró Business ID');
+      }
+    } catch (e) {
+      debugPrint('Error al obtener el Business ID: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners(); // Notifica después de cargar
     }
   }
 
-  // Método para establecer el businessId manualmente
+  /// Permite establecer el ID manualmente si fuese necesario
   void setBusinessId(String? id) {
     _businessId = id;
     _isLoading = false;

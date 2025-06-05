@@ -9,7 +9,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(
@@ -17,12 +17,22 @@ void main() async {
   );
   await initializeDateFormatting('es', null);
   usePathUrlStrategy();
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => BusinessModel(),
-      child: MyApp(),
-    ),
-  );
+  runApp(const MyAppWrapper());
+}
+
+class MyAppWrapper extends StatelessWidget {
+  const MyAppWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => BusinessModel()),
+        // ChangeNotifierProvider(create: (_) => UserModel()),
+      ],
+      child: const MyApp(),
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -32,10 +42,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      supportedLocales: const [
-        Locale('es', 'ES'),
-      ],
-      locale: Locale('es', 'ES'),
+      supportedLocales: const [Locale('es', 'ES')],
+      locale: const Locale('es', 'ES'),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

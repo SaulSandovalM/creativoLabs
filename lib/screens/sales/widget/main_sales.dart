@@ -12,18 +12,37 @@ String formatDate(dynamic date) {
   return DateFormat('dd MMMM', 'es').format(date);
 }
 
-class MainSales extends StatelessWidget {
+class MainSales extends StatefulWidget {
   final double headerHeight;
 
   const MainSales({super.key, required this.headerHeight});
 
   @override
+  State<MainSales> createState() => _MainSalesState();
+}
+
+class _MainSalesState extends State<MainSales> {
+  bool _initialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_initialized) {
+      final businessModel = Provider.of<BusinessModel>(context, listen: false);
+      if (businessModel.businessId == null) {
+        businessModel.fetchBusinessId();
+      }
+      _initialized = true;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final businessId = context.watch<BusinessModel>().businessId;
+    final businessModel = context.watch<BusinessModel>();
+    final businessId = businessModel.businessId;
 
-    debugPrint('Business ID: $businessId');
-
-    if (businessId == null) {
+    if (businessModel.isLoading || businessId == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -37,15 +56,12 @@ class MainSales extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(child: Text('No hay información'));
           }
-
           final docs = snapshot.data!.docs;
           final sales =
               docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
-
           return PaginatedDataTable(
             columns: const [
               DataColumn(label: Text('Fecha')),

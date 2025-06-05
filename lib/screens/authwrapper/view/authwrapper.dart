@@ -13,8 +13,7 @@ class AuthWrapper extends StatefulWidget {
 }
 
 class _AuthWrapperState extends State<AuthWrapper> {
-  bool _loadingBusiness = false;
-  bool _businessLoaded = false;
+  bool _initCalled = false;
 
   @override
   void didChangeDependencies() {
@@ -23,45 +22,33 @@ class _AuthWrapperState extends State<AuthWrapper> {
     final user = FirebaseAuth.instance.currentUser;
     final businessModel = Provider.of<BusinessModel>(context, listen: false);
 
-    if (user != null && !_businessLoaded && !_loadingBusiness) {
-      _loadingBusiness = true;
-
-      businessModel.fetchBusinessId().then((_) {
-        if (mounted) {
-          setState(() {
-            _businessLoaded = true;
-          });
-        }
-      });
+    if (!_initCalled && user != null && businessModel.businessId == null) {
+      _initCalled = true;
+      businessModel.fetchBusinessId();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final businessModel = context.watch<BusinessModel>();
+
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        // Esperando estado de autenticación
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        // Usuario autenticado
         if (snapshot.hasData) {
-          // Esperando cargar el businessId
-          if (!_businessLoaded) {
+          if (businessModel.isLoading || businessModel.businessId == null) {
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             );
           }
-
-          // businessId ya cargado
           return const Dashboard();
         }
-
-        // Usuario no autenticado
         return const Home();
       },
     );

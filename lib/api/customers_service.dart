@@ -2,14 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CustomersService {
   final CollectionReference customersRef =
-      FirebaseFirestore.instance.collection('customers');
+      FirebaseFirestore.instance.collection('business');
 
   // Obtener clientes de un negocio específico
   Stream<QuerySnapshot> getCustomersStreamByBusiness(String businessId) {
     return customersRef
-        .where('businessId', isEqualTo: businessId)
+        .doc(businessId)
+        .collection('customers')
         .orderBy('createdAt', descending: true)
-        .limit(10)
         .snapshots();
   }
 
