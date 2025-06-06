@@ -258,7 +258,7 @@ final router = GoRouter(
                                         .routerDelegate
                                         .currentConfiguration
                                         .fullPath ==
-                                    '/servcies'
+                                    '/services'
                                 ? Colors.white
                                 : Colors.black,
                           ),
@@ -274,7 +274,16 @@ final router = GoRouter(
                         },
                       ),
                       ListTile(
-                        leading: const Icon(Icons.person),
+                        leading: Icon(
+                          Icons.person,
+                          color: GoRouter.of(context)
+                                      .routerDelegate
+                                      .currentConfiguration
+                                      .fullPath ==
+                                  '/customers'
+                              ? Colors.white
+                              : Colors.black,
+                        ),
                         title: Text(
                           'Clientes',
                           style: TextStyle(
@@ -292,7 +301,7 @@ final router = GoRouter(
                                 .currentConfiguration
                                 .fullPath ==
                             '/customers',
-                        selectedTileColor: Colors.grey.shade200,
+                        selectedTileColor: Colors.blue,
                         onTap: () {
                           context.go('/customers');
                         },

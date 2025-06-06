@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:creativolabs/api/service_service.dart';
+import 'package:creativolabs/providers/business_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 String formatDate(dynamic date) {
   if (date is Timestamp) {
@@ -20,17 +22,38 @@ class MainService extends StatefulWidget {
 }
 
 class MainServiceState extends State<MainService> {
-  final ServiceService _serviceService = ServiceService();
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final businessModel = Provider.of<BusinessModel>(context, listen: false);
+      if (businessModel.businessId == null) {
+        businessModel.fetchBusinessId();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final businessModel = context.watch<BusinessModel>();
+    final businessId = businessModel.businessId;
+
+    if (businessModel.isLoading || businessId == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final serviceService = ServiceService();
+
     return SizedBox(
       width: double.infinity,
       child: StreamBuilder<QuerySnapshot>(
-        stream: _serviceService.getServiceStreamByBusiness('bus_456'),
+        stream: serviceService.getServiceStreamByBusiness(businessId),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('No hay información'));
           }
           final docs = snapshot.data!.docs;
           final services =
@@ -72,7 +95,7 @@ class _OrderDataSource extends DataTableSource {
       DataCell(
         Text(
           order['price'] != null
-              ? '\$${order['price'].toStringAsFixed(2)}'
+              ? '\$${order['price'].toString()}'
               : 'Sin precio',
           style: TextStyle(
             fontSize: 12,

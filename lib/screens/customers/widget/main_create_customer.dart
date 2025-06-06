@@ -77,7 +77,6 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
     if (_formKey.currentState!.validate()) {
       final businessId =
           Provider.of<BusinessModel>(context, listen: false).businessId;
-      debugPrint('Business ID: $businessId');
       if (businessId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('No se ha cargado el negocio actual')),

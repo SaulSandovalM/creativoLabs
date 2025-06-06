@@ -36,15 +36,12 @@ class CustomersService {
   }) async {
     try {
       // Referencia a la colección de clientes bajo un negocio específico
-      final customerRef = FirebaseFirestore.instance
-          .collection('business')
-          .doc(businessId)
-          .collection('customers');
+      final customerRef = customersRef.doc(businessId).collection('customers');
 
       // 1. Crear el cliente
       final nuevoCliente = await customerRef.add({
         ...customerData,
-        'businessId': businessId, // Útil para consultas
+        'businessId': businessId,
         'createdAt': FieldValue.serverTimestamp(),
       });
 
