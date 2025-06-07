@@ -14,6 +14,7 @@ import 'package:creativolabs/screens/profile/view/profile.dart';
 import 'package:creativolabs/screens/sales/view/create_sale.dart';
 import 'package:creativolabs/screens/sales/view/sales.dart';
 import 'package:creativolabs/screens/service/view/create_service.dart';
+import 'package:creativolabs/screens/service/view/edit_service.dart';
 import 'package:creativolabs/screens/service/view/service.dart';
 import 'package:creativolabs/screens/signin/view/signin.dart';
 import 'package:creativolabs/screens/signup/view/signup.dart';
@@ -307,30 +308,6 @@ final router = GoRouter(
                         },
                       ),
                       ListTile(
-                        leading: const Icon(Icons.list_alt),
-                        title: Text(
-                          'Inventario',
-                          style: TextStyle(
-                            color: GoRouter.of(context)
-                                        .routerDelegate
-                                        .currentConfiguration
-                                        .fullPath ==
-                                    '/inventario'
-                                ? Colors.white
-                                : Colors.black,
-                          ),
-                        ),
-                        selected: GoRouter.of(context)
-                                .routerDelegate
-                                .currentConfiguration
-                                .fullPath ==
-                            '/inventario',
-                        selectedTileColor: Colors.grey.shade200,
-                        onTap: () {
-                          context.go('/inventario');
-                        },
-                      ),
-                      ListTile(
                         leading: const Icon(Icons.trending_up),
                         title: Text(
                           'Finanzas',
@@ -483,6 +460,15 @@ final router = GoRouter(
         GoRoute(
           path: '/create-service',
           builder: (context, state) => const CreateService(),
+          redirect: (context, state) => _requireAuth(),
+        ),
+        GoRoute(
+          path: '/edit-service/:serviceId',
+          name: 'edit-service',
+          builder: (context, state) {
+            final serviceId = state.pathParameters['serviceId']!;
+            return EditService(serviceId: serviceId);
+          },
           redirect: (context, state) => _requireAuth(),
         ),
         GoRoute(

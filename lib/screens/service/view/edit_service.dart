@@ -1,10 +1,12 @@
 import 'package:creativolabs/core/widgets/container.dart';
-import 'package:creativolabs/screens/service/widget/main_create_service.dart';
+import 'package:creativolabs/screens/service/widget/main_edit_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class CreateService extends StatelessWidget {
-  const CreateService({super.key});
+class EditService extends StatelessWidget {
+  final String serviceId;
+
+  const EditService({super.key, required this.serviceId});
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +46,7 @@ class CreateService extends StatelessWidget {
               ),
             ],
           ),
-          MainCreateService(),
+          MainEditService(serviceId: serviceId),
           SizedBox(height: 40),
         ],
       ),

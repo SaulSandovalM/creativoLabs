@@ -69,25 +69,6 @@ class Dashboard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Card(
-                        color: Colors.white,
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TitleCard(
-                                  title: 'Inventario bajo',
-                                ),
-                                const SizedBox(height: 10),
-                                StockList(),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -157,23 +138,6 @@ class Dashboard extends StatelessWidget {
                             ),
                           ),
                         ],
-                      ),
-                      Card(
-                        color: Colors.white,
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TitleCard(
-                                  title: 'Actividad',
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
                       ),
                     ],
                   ),

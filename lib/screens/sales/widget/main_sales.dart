@@ -94,7 +94,7 @@ class _OrderDataSource extends DataTableSource {
           children: [
             Text(order['orderNumber']?.toString() ?? 'Sin número'),
             Text(
-              '${order['serviceName']} - \$${(order['price'] ?? 0).toStringAsFixed(2)}',
+              '${order['service']} - \$${(order['price'] ?? 0).toStringAsFixed(2)}',
               style: const TextStyle(
                 fontSize: 12,
                 color: Color(0xff667085),

@@ -17,9 +17,9 @@ class SalesService {
   // Obtener órdenes de un negocio específico
   Stream<QuerySnapshot> getSalesStreamByBusiness(String businessId) {
     return salesRef
-        .where('businessId', isEqualTo: businessId)
+        .doc(businessId)
+        .collection('orders')
         .orderBy('createdAt', descending: true)
-        .limit(10)
         .snapshots();
   }
 
