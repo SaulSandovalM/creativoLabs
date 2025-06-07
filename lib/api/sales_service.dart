@@ -63,4 +63,45 @@ class SalesService {
       return 1;
     }
   }
+
+  Future<void> saveSale({
+    required String businessId,
+    required String customerId,
+    required String customerName,
+    required int orderNumber,
+    required String date,
+    required String time,
+    required String state,
+    required String city,
+    required String address,
+    required String cp,
+    required String service,
+    required double price,
+    required String note,
+  }) async {
+    try {
+      final DocumentReference saleDoc =
+          salesRef.doc(businessId).collection('orders').doc();
+      final saleData = {
+        'customerId': customerId,
+        'orderNumber': orderNumber,
+        'customerName': customerName,
+        'createdAt': FieldValue.serverTimestamp(),
+        'date': date,
+        'time': time,
+        'state': state,
+        'city': city,
+        'address': address,
+        'cp': cp,
+        'service': service,
+        'price': price,
+        'note': note,
+        'status': 'Pendiente',
+      };
+      // debugPrint('Guardando venta: $saleData');
+      await saleDoc.set(saleData);
+    } catch (e) {
+      throw Exception('Error al guardar la venta: $e');
+    }
+  }
 }

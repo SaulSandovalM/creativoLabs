@@ -91,14 +91,11 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
           'email': _emailController.text,
           'phoneNumber': _phoneController.text,
           'company': _companyController.text,
-          'status': 'activo',
-        },
-        addressData: {
+          'status': 'Activo',
           'estado': estadoSeleccionado,
           'ciudad': _cityController.text,
           'direccion': _addressController.text,
           'cp': _cpController.text,
-          'principal': true,
         },
       );
       if (!mounted) return;

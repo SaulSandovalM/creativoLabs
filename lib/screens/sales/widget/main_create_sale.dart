@@ -1,10 +1,12 @@
 import 'package:creativolabs/api/customers_service.dart';
 import 'package:creativolabs/api/sales_service.dart';
+import 'package:creativolabs/api/service_service.dart';
 import 'package:creativolabs/providers/business_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 class MainCreateSale extends StatefulWidget {
   const MainCreateSale({super.key});
@@ -16,11 +18,8 @@ class MainCreateSale extends StatefulWidget {
 class _MainCreateSaleState extends State<MainCreateSale> {
   final _formKey = GlobalKey<FormState>();
 
-  List<String> clientes = [];
-  String? clienteSeleccionado;
-  String? customerId;
-  String? businessId;
-
+  List<Map<String, dynamic>> clientes = [];
+  List<Map<String, dynamic>> servicios = [];
   List<String> estados = [
     'Aguascalientes',
     'Baja California',
@@ -56,7 +55,13 @@ class _MainCreateSaleState extends State<MainCreateSale> {
     'Zacatecas'
   ];
 
+  String? servicioSeleccionado;
+  String? clienteSeleccionado;
+  String? customerId;
+  String? businessId;
   String? estadoSeleccionado;
+
+  final _priceController = TextEditingController();
   final TextEditingController _orderNumberController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
@@ -64,13 +69,11 @@ class _MainCreateSaleState extends State<MainCreateSale> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _cpController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
-  final TextEditingController _discountController = TextEditingController();
-  final TextEditingController _shippingController = TextEditingController();
 
   final CustomersService _customersService = CustomersService();
   final SalesService _salesService = SalesService();
+  final ServiceService _serviceService = ServiceService();
 
-  double subtotal = 1000.0;
   double total = 0.0;
 
   @override
@@ -80,21 +83,36 @@ class _MainCreateSaleState extends State<MainCreateSale> {
     businessId = model.businessId;
     _cargarClientes();
     _generarNumeroOrden();
+    _cargarServicios();
   }
 
   Future<void> _cargarClientes() async {
     try {
-      final businessId =
-          Provider.of<BusinessModel>(context, listen: false).businessId;
-      if (businessId == null) return;
-
-      final stream = _customersService.getCustomersStreamByBusiness(businessId);
+      final stream =
+          _customersService.getCustomersStreamByBusiness(businessId!);
       stream.listen((snapshot) {
-        final List<String> clientesList =
-            snapshot.docs.map((doc) => doc['name'] as String).toList();
+        final List<Map<String, dynamic>> clientesList =
+            snapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          return {
+            'id': doc.id,
+            'name': data['name'] ?? '',
+            'address': data['direccion'] ?? '',
+            'city': data['ciudad'] ?? '',
+            'state': data['estado'] ?? '',
+            'cp': data['cp']?.toString() ?? '',
+          };
+        }).toList();
         setState(() {
           clientes = clientesList;
-          if (clientes.isNotEmpty) clienteSeleccionado = clientes.first;
+          if (clientes.isNotEmpty) {
+            customerId = clientes.first['id'];
+            clienteSeleccionado = clientes.first['name'];
+            estadoSeleccionado = clientes.first['state'];
+            _cityController.text = clientes.first['city'];
+            _addressController.text = clientes.first['address'];
+            _cpController.text = clientes.first['cp'];
+          }
         });
       }, onError: (error) {
         debugPrint('Error al cargar clientes: $error');
@@ -104,7 +122,6 @@ class _MainCreateSaleState extends State<MainCreateSale> {
         });
       });
     } catch (e) {
-      debugPrint('Excepción al cargar clientes: $e');
       setState(() {
         clientes = [];
         clienteSeleccionado = null;
@@ -139,56 +156,76 @@ class _MainCreateSaleState extends State<MainCreateSale> {
     }
   }
 
-  Future<void> _submitSale() async {
-    //   if (_formKey.currentState?.validate() ?? false) {
-    //     final businessId = Provider.of<BusinessModel>(context, listen: false).businessId;
-    //     if (businessId == null) return;
+  Future<void> _cargarServicios() async {
+    final stream = _serviceService.getServiceStreamByBusiness(businessId!);
+    stream.listen((snapshot) {
+      final List<Map<String, dynamic>> serviciosData = snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return {
+          'name': data['name'],
+          'price': data['price'],
+        };
+      }).toList();
+      setState(() {
+        servicios = serviciosData;
+        if (servicios.isNotEmpty) {
+          servicioSeleccionado = servicios.first['name'];
+          _priceController.text = servicios.first['price'].toString();
+        }
+      });
+    }, onError: (error) {
+      debugPrint('Error al cargar servicios: $error');
+      setState(() {
+        servicios = [];
+        servicioSeleccionado = null;
+        _priceController.clear();
+      });
+    });
+  }
 
-    //     try {
-    //       final now = DateTime.now();
-    //       final discount = double.tryParse(_discountController.text.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
-    //       final shipping = double.tryParse(_shippingController.text.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
-    //       total = subtotal - discount + shipping;
+  Future<void> _submitOrder() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (businessId == null ||
+        clienteSeleccionado == null ||
+        servicioSeleccionado == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Faltan datos importantes para guardar la orden'),
+        ),
+      );
+      return;
+    }
 
-    //       final saleData = {
-    //         'orderNumber': int.parse(_orderNumberController.text),
-    //         'createdAt': now,
-    //         'customerName': clienteSeleccionado,
-    //         'customerId': customerId ?? '',
-    //         'date': _dateController.text,
-    //         'time': _timeController.text,
-    //         'location': {
-    //           'estado': estadoSeleccionado,
-    //           'ciudad': _cityController.text,
-    //           'direccion': _addressController.text,
-    //           'cp': _cpController.text,
-    //         },
-    //         'note': _noteController.text,
-    //         'discount': discount,
-    //         'shipping': shipping,
-    //         'subtotal': subtotal,
-    //         'total': total,
-    //         'status': 'Pendiente',
-    //       };
-
-    //       await FirebaseFirestore.instance
-    //           .collection('business')
-    //           .doc(businessId)
-    //           .collection('sales')
-    //           .add(saleData);
-
-    //       ScaffoldMessenger.of(context).showSnackBar(
-    //         const SnackBar(content: Text('Venta registrada exitosamente')),
-    //       );
-
-    //       Navigator.pop(context);
-    //     } catch (e) {
-    //       debugPrint('Error al guardar la venta: $e');
-    //       ScaffoldMessenger.of(context).showSnackBar(
-    //         const SnackBar(content: Text('Error al guardar la venta')),
-    //       );
-    //     }
-    //   }
+    try {
+      final double total = double.tryParse(
+            _priceController.text.replaceAll(RegExp(r'[^\d.]'), ''),
+          ) ??
+          0.0;
+      await _salesService.saveSale(
+        businessId: businessId!,
+        customerId: customerId ?? '',
+        customerName: clienteSeleccionado!,
+        orderNumber: int.parse(_orderNumberController.text),
+        date: _dateController.text,
+        time: _timeController.text,
+        state: estadoSeleccionado!,
+        city: _cityController.text,
+        address: _addressController.text,
+        cp: _cpController.text,
+        service: servicioSeleccionado!,
+        price: total,
+        note: _noteController.text,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Venta registrada exitosamente')),
+      );
+      context.go('/sales');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al guardar la venta')),
+      );
+    }
   }
 
   @override
@@ -200,8 +237,6 @@ class _MainCreateSaleState extends State<MainCreateSale> {
     _addressController.dispose();
     _cpController.dispose();
     _noteController.dispose();
-    _discountController.dispose();
-    _shippingController.dispose();
     super.dispose();
   }
 
@@ -233,15 +268,24 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                         labelText: 'Cliente',
                         border: OutlineInputBorder(),
                       ),
-                      items: clientes.map((String cliente) {
+                      items: clientes.map((cliente) {
                         return DropdownMenuItem<String>(
-                          value: cliente,
-                          child: Text(cliente),
+                          value: cliente['name'],
+                          child: Text(cliente['name']),
                         );
                       }).toList(),
                       onChanged: (String? nuevoCliente) {
+                        final cliente = clientes.firstWhere(
+                          (c) => c['name'] == nuevoCliente,
+                          orElse: () => {},
+                        );
                         setState(() {
+                          customerId = cliente['id'];
                           clienteSeleccionado = nuevoCliente;
+                          estadoSeleccionado = cliente['state'];
+                          _cityController.text = cliente['city'];
+                          _addressController.text = cliente['address'];
+                          _cpController.text = cliente['cp'];
                         });
                       },
                       validator: (value) {
@@ -356,6 +400,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                   const SizedBox(width: 25),
                   Expanded(
                     child: TextFormField(
+                      controller: _cityController,
                       decoration: const InputDecoration(
                         labelText: 'Ciudad',
                         border: OutlineInputBorder(),
@@ -375,6 +420,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                 children: [
                   Expanded(
                     child: TextFormField(
+                      controller: _addressController,
                       decoration: const InputDecoration(
                         labelText: 'Dirección',
                         border: OutlineInputBorder(),
@@ -390,6 +436,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                   const SizedBox(width: 25),
                   Expanded(
                     child: TextFormField(
+                      controller: _cpController,
                       keyboardType: TextInputType.number,
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly,
@@ -429,6 +476,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                 children: [
                   Expanded(
                     child: TextFormField(
+                      controller: _noteController,
                       maxLines: 5,
                       textAlignVertical: TextAlignVertical.top,
                       decoration: const InputDecoration(
@@ -438,7 +486,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese una descripción';
+                          return 'Por favor ingrese una nota';
                         }
                         return null;
                       },
@@ -455,20 +503,33 @@ class _MainCreateSaleState extends State<MainCreateSale> {
               Row(
                 children: [
                   Expanded(
-                    child: TextFormField(
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        CurrencyInputFormatter(),
-                      ],
+                    child: DropdownButtonFormField<String>(
+                      value: servicioSeleccionado,
                       decoration: const InputDecoration(
-                        labelText: 'Descuento',
+                        labelText: 'Servicio',
                         border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.attach_money),
                       ),
+                      items: servicios.map((servicio) {
+                        return DropdownMenuItem<String>(
+                          value: servicio['name'],
+                          child: Text(servicio['name']),
+                        );
+                      }).toList(),
+                      onChanged: (String? nuevoServicio) {
+                        setState(() {
+                          servicioSeleccionado = nuevoServicio;
+
+                          final servicio = servicios.firstWhere(
+                            (s) => s['name'] == nuevoServicio,
+                            orElse: () => {'price': 0},
+                          );
+
+                          _priceController.text = servicio['price'].toString();
+                        });
+                      },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese un precio';
+                          return 'Por favor seleccione un servicio';
                         }
                         return null;
                       },
@@ -477,13 +538,15 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                   const SizedBox(width: 25),
                   Expanded(
                     child: TextFormField(
+                      controller: _priceController,
+                      readOnly: true,
                       keyboardType: TextInputType.number,
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly,
                         CurrencyInputFormatter(),
                       ],
                       decoration: const InputDecoration(
-                        labelText: 'Envio',
+                        labelText: 'Total',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.attach_money),
                       ),
@@ -505,85 +568,25 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                     Column(
                       children: [
                         SizedBox(
-                          width: 350,
                           child: Column(
                             children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text('Subtotal'),
-                                  const Text('\$1000.00'),
-                                ],
-                              ),
                               SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text('Descuento'),
-                                  const Text('\$1000.00'),
-                                ],
-                              ),
-                              SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text('Envio'),
-                                  const Text('\$1000.00'),
-                                ],
-                              ),
-                              SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text('Total'),
-                                  const Text('\$1000.00'),
-                                ],
-                              ),
-                              SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: _submitSale,
-                                    style: ElevatedButton.styleFrom(
-                                      elevation: 0,
-                                      backgroundColor: Color(0xFFf8f1fa),
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 30,
-                                        vertical: 18,
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      'Cancelar',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
+                              ElevatedButton(
+                                onPressed: _submitOrder,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 30,
+                                    vertical: 18,
                                   ),
-                                  ElevatedButton(
-                                    onPressed: _submitSale,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blue,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 30,
-                                        vertical: 18,
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      'Guardar venta',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
+                                ),
+                                child: const Text(
+                                  'Crear orden',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
                                   ),
-                                ],
+                                ),
                               ),
                             ],
                           ),

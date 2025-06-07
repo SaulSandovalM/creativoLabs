@@ -32,24 +32,24 @@ class CustomersService {
   Future<void> addCustomerWithAddress({
     required String businessId,
     required Map<String, dynamic> customerData,
-    required Map<String, dynamic> addressData,
+    // required Map<String, dynamic> addressData,
   }) async {
     try {
       // Referencia a la colección de clientes bajo un negocio específico
       final customerRef = customersRef.doc(businessId).collection('customers');
 
       // 1. Crear el cliente
-      final nuevoCliente = await customerRef.add({
+      await customerRef.add({
         ...customerData,
         'businessId': businessId,
         'createdAt': FieldValue.serverTimestamp(),
       });
 
       // 2. Crear dirección como subcolección del nuevo cliente
-      await nuevoCliente.collection('addresses').add({
-        ...addressData,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+      // await nuevoCliente.collection('addresses').add({
+      //   ...addressData,
+      //   'createdAt': FieldValue.serverTimestamp(),
+      // });
     } catch (e) {
       rethrow;
     }
