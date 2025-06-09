@@ -341,6 +341,12 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                         border: OutlineInputBorder(),
                         suffixIcon: Icon(Icons.access_time),
                       ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor selecciona una hora';
+                        }
+                        return null;
+                      },
                       onTap: () async {
                         TimeOfDay? pickedTime = await showTimePicker(
                           context: context,

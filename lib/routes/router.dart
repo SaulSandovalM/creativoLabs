@@ -28,14 +28,20 @@ final router = GoRouter(
   initialLocation: '/',
   redirect: (context, state) {
     final user = FirebaseAuth.instance.currentUser;
-    final isAuthPage =
-        state.uri.toString() == '/signin' || state.uri.toString() == '/signup';
-    if (user == null && !isAuthPage) {
+    final publicRoutes = [
+      '/signin',
+      '/signup',
+      '/home',
+      '/about',
+      '/contact',
+      '/services',
+      '/terms',
+      '/politics'
+    ];
+    if (user == null && !publicRoutes.contains(state.uri.toString())) {
       return '/home';
     }
-    // if (user != null && isAuthPage) {
-    //   return '/profile';
-    // }
+
     return null;
   },
   routes: [

@@ -117,7 +117,7 @@ class _OrderDataSource extends DataTableSource {
       DataCell(
         Text(
           order['description'] != null
-              ? '\$${order['description'].toString()}'
+              ? order['description'].toString()
               : 'Sin precio',
           style: TextStyle(
             fontSize: 12,
