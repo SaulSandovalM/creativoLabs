@@ -10,19 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps: 
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.24.5' 
-  
-    - name: Install dependencies
-      run: flutter pub get
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5' 
+    
+      - name: Install dependencies
+        run: flutter pub get
 
-    - name: Build Flutter Web
-      run: flutter build web --release
+      - name: Run Flutter commands
+        run: flutter analyze
+
+      # - name: Run tests
+      #   run: flutter test
+
+    # - name: Build Flutter Web
+    #   run: flutter build web --release
 
     # - name: Deploy to Firebase Hosting
     #   uses: FirebaseExtended/action-hosting-deploy@v0
