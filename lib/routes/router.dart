@@ -3,6 +3,7 @@ import 'package:creativolabs/core/widgets/footer.dart';
 import 'package:creativolabs/core/widgets/site_logo.dart';
 import 'package:creativolabs/screens/about/view/about.dart';
 import 'package:creativolabs/screens/authwrapper/view/authwrapper.dart';
+import 'package:creativolabs/screens/changepassword/view/change_password.dart';
 import 'package:creativolabs/screens/contact/view/contact.dart';
 import 'package:creativolabs/screens/customers/view/create_customer.dart';
 import 'package:creativolabs/screens/customers/view/customers.dart';
@@ -11,6 +12,7 @@ import 'package:creativolabs/screens/dashboard/view/dashboard.dart';
 import 'package:creativolabs/screens/home/view/home.dart';
 import 'package:creativolabs/screens/politics/view/politics.dart';
 import 'package:creativolabs/screens/profile/view/profile.dart';
+import 'package:creativolabs/screens/resetpassword/view/reset_password.dart';
 import 'package:creativolabs/screens/sales/view/create_sale.dart';
 import 'package:creativolabs/screens/sales/view/sales.dart';
 import 'package:creativolabs/screens/service/view/create_service.dart';
@@ -36,7 +38,8 @@ final router = GoRouter(
       '/contact',
       '/services',
       '/terms',
-      '/politics'
+      '/politics',
+      '/reset-password',
     ];
     if (user == null && !publicRoutes.contains(state.uri.toString())) {
       return '/home';
@@ -421,6 +424,22 @@ final router = GoRouter(
         GoRoute(
           path: '/signup',
           builder: (context, state) => const SignUp(),
+        ),
+        GoRoute(
+          path: '/reset-password',
+          builder: (context, state) => const ResetPassword(),
+        ),
+        GoRoute(
+          path: '/change-password',
+          builder: (context, state) {
+            final oobCode = state.uri.queryParameters['oobCode'];
+            if (oobCode == null) {
+              return const Center(
+                child: Text('Código de recuperación no válido.'),
+              );
+            }
+            return ChangePassword(oobCode: oobCode);
+          },
         ),
         GoRoute(
           path: '/about',

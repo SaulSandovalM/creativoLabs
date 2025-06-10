@@ -123,13 +123,19 @@ class MainSignInState extends State<MainSignIn> {
                               validator: _validateEmail,
                             ),
                             const SizedBox(height: 20),
-                            const Row(
+                            Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Text(
-                                  'Olvidaste tu contraseña?',
-                                  style: TextStyle(
-                                    color: Colors.blue,
+                                GestureDetector(
+                                  onTap: () {
+                                    context.go('/reset-password');
+                                  },
+                                  child: const Text(
+                                    '¿Olvidaste tu contraseña?',
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                      decoration: TextDecoration.underline,
+                                    ),
                                   ),
                                 ),
                               ],

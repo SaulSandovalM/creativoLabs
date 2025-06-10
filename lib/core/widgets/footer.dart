@@ -30,7 +30,6 @@ class Footer extends StatelessWidget {
                   const SizedBox(height: 16),
                   InkWell(
                     onTap: () {
-                      debugPrint('Acerca de tapped');
                       context.go('/about');
                     },
                     child: const Text(
