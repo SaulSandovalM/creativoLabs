@@ -41,14 +41,14 @@ See full list in [`pubspec.yaml`](./pubspec.yaml)
 
 1. **Clone the repo**
 ```bash
-    git clone https://github.com/SaulSandovalM/creativoLabs.git
-    cd creativolabs
+git clone https://github.com/SaulSandovalM/creativoLabs.git
+cd creativolabs
 ```
 
-2. ** Install dependencies**
+2. **Install dependencies**
 
 ```bash
-    flutter pub get
+flutter pub get
 ```
 
 3. Add your .env file
@@ -56,13 +56,13 @@ See full list in [`pubspec.yaml`](./pubspec.yaml)
 Create a .env file in the root with the following keys:
 
 ```bash
-    FIREBASE_API_KEY=
-    FIREBASE_APP_ID=
-    FIREBASE_MESSAGING_SENDER_ID=
-    FIREBASE_PROJECT_ID=
-    FIREBASE_AUTH_DOMAIN=
-    FIREBASE_STORAGE_BUCKET=
-    FIREBASE_MEASUREMENT_ID=
+FIREBASE_API_KEY=
+FIREBASE_APP_ID=
+FIREBASE_MESSAGING_SENDER_ID=
+FIREBASE_PROJECT_ID=
+FIREBASE_AUTH_DOMAIN=
+FIREBASE_STORAGE_BUCKET=
+FIREBASE_MEASUREMENT_ID=
 ```
 
 ---
@@ -70,7 +70,7 @@ Create a .env file in the root with the following keys:
 ## Run the app
 
 ```bash
-    flutter run -d chrome
+flutter run -d chrome
 ```
 
 ---
@@ -85,7 +85,7 @@ Environment variables are defined in .env and must not be committed
 ## Running Test
 
 ```bash
-    flutter test
+flutter test
 ```
 
 ---
@@ -95,13 +95,13 @@ Environment variables are defined in .env and must not be committed
 This project follows a scalable, modular structure:
 
 ```bash
-    lib/
-    ├── api/
-    ├── core/
-    ├── providers/
-    ├── routes/
-    ├── screens/
-    └── main.dart
+lib/
+├── api/
+├── core/
+├── providers/
+├── routes/
+├── screens/
+└── main.dart
 ```
 
 ---
