@@ -40,6 +40,7 @@ final router = GoRouter(
       '/terms',
       '/politics',
       '/reset-password',
+      '/change-password',
     ];
     if (user == null && !publicRoutes.contains(state.uri.toString())) {
       return '/home';
