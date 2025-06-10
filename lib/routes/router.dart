@@ -49,6 +49,25 @@ final router = GoRouter(
     return null;
   },
   routes: [
+    GoRoute(
+      path: '/change-password',
+      builder: (context, state) {
+        final oobCode = state.uri.queryParameters['oobCode'];
+        if (oobCode == null || oobCode.isEmpty) {
+          return const Scaffold(
+            body: Center(
+              child: Text(
+                'Código de recuperación no válido.',
+                style: TextStyle(fontSize: 16, color: Colors.red),
+              ),
+            ),
+          );
+        }
+        return ChangePassword(
+          oobCode: oobCode,
+        );
+      },
+    ),
     ShellRoute(
       builder: (context, state, child) {
         final user = FirebaseAuth.instance.currentUser;
@@ -429,18 +448,6 @@ final router = GoRouter(
         GoRoute(
           path: '/reset-password',
           builder: (context, state) => const ResetPassword(),
-        ),
-        GoRoute(
-          path: '/change-password',
-          builder: (context, state) {
-            final oobCode = state.uri.queryParameters['oobCode'];
-            if (oobCode == null) {
-              return const Center(
-                child: Text('Código de recuperación no válido.'),
-              );
-            }
-            return ChangePassword(oobCode: oobCode);
-          },
         ),
         GoRoute(
           path: '/about',

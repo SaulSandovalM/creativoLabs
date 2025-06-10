@@ -18,10 +18,8 @@ class _AuthWrapperState extends State<AuthWrapper> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
     final user = FirebaseAuth.instance.currentUser;
     final businessModel = Provider.of<BusinessModel>(context, listen: false);
-
     if (!_initCalled && user != null && businessModel.businessId == null) {
       _initCalled = true;
       businessModel.fetchBusinessId();
@@ -40,7 +38,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
             body: Center(child: CircularProgressIndicator()),
           );
         }
-
         if (snapshot.hasData) {
           if (businessModel.isLoading || businessModel.businessId == null) {
             return const Scaffold(
