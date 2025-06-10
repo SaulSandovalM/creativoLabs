@@ -2,13 +2,17 @@ import 'package:creativolabs/core/constants/colors.dart';
 import 'package:creativolabs/core/widgets/container.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class MainChangePassword extends StatefulWidget {
   final String oobCode;
   final double headerHeight;
 
-  const MainChangePassword(
-      {super.key, required this.oobCode, required this.headerHeight});
+  const MainChangePassword({
+    super.key,
+    required this.oobCode,
+    required this.headerHeight,
+  });
 
   @override
   State<MainChangePassword> createState() => _MainChangePasswordState();
@@ -38,7 +42,9 @@ class _MainChangePasswordState extends State<MainChangePassword> {
         _success = 'Contraseña restablecida correctamente.';
       });
       Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) Navigator.pushReplacementNamed(context, '/login');
+        if (mounted) {
+          context.go('/login');
+        }
       });
     } on FirebaseAuthException catch (e) {
       setState(() {

@@ -22,15 +22,12 @@ class MainSignInState extends State<MainSignIn> {
 
   Future<void> _signIn() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isLoading = true);
-
     try {
       await _auth.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-
       if (!mounted) return;
       context.go('/dashboard');
     } on FirebaseAuthException catch (e) {
@@ -49,10 +46,8 @@ class MainSignInState extends State<MainSignIn> {
       'user-not-found': 'No se encontró un usuario con ese correo.',
       'wrong-password': 'La contraseña es incorrecta.',
     };
-
     final errorMessage = errorMessages[errorCode] ??
         'Ocurrió un error: $errorCode. Inténtalo de nuevo.';
-
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Error: $errorMessage')),
     );
@@ -134,7 +129,6 @@ class MainSignInState extends State<MainSignIn> {
                                     '¿Olvidaste tu contraseña?',
                                     style: TextStyle(
                                       color: Colors.blue,
-                                      decoration: TextDecoration.underline,
                                     ),
                                   ),
                                 ),

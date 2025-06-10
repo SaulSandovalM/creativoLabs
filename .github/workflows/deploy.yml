@@ -3,7 +3,7 @@ name: CI/CD Build & Deploy Flutter Web to Firebase Hosting
 on: 
   push:
     branches: 
-      - develop 
+      - main 
 
 jobs: 
   first-job:
@@ -21,7 +21,7 @@ jobs:
       - name: Delete main.dart
         run: rm -f lib/main.dart
 
-      - name: Crear un nuevo main.dart
+      - name: Create new main.dart
         run: |
           cat << 'EOF' > lib/main.dart
           import 'package:creativolabs/firebase_options.dart';
@@ -208,9 +208,6 @@ jobs:
 
       - name: Run Flutter commands
         run: flutter analyze
-
-      # - name: Run tests
-      #   run: flutter test
 
       - name: Build Flutter Web
         run: flutter build web --release
