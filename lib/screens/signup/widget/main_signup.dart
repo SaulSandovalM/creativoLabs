@@ -44,13 +44,18 @@ class MainSignUpState extends State<MainSignUp> {
           email: _emailController.text.trim(),
         );
 
+        // Enviar correo de verificación
+        await userCredential.user!.sendEmailVerification();
+
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Registro y negocio creados correctamente.'),
+            content: Text(
+              'Registro exitoso. Revisa tu correo para verificar tu cuenta.',
+            ),
           ),
         );
-        context.go('/dashboard');
+        context.go('/signin');
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(

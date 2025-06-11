@@ -24,12 +24,27 @@ class MainSignInState extends State<MainSignIn> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
     try {
-      await _auth.signInWithEmailAndPassword(
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      if (!mounted) return;
-      context.go('/dashboard');
+      User? user = userCredential.user;
+      await user?.reload();
+      user = _auth.currentUser;
+      if (user != null && user.emailVerified) {
+        if (!mounted) return;
+        context.go('/dashboard');
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Debes verificar tu correo electrónico antes de ingresar.',
+            ),
+          ),
+        );
+        await _auth.signOut();
+      }
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       _showAuthError(e.code);
@@ -156,7 +171,22 @@ class MainSignInState extends State<MainSignIn> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    SizedBox(width: 10),
+                                    Row(
+                                      children: [
+                                        const Text(
+                                          "¿Aún no tienes una cuenta?",
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              context.go('/signup'),
+                                          child: const Text(
+                                            "Regístrate aquí.",
+                                            style:
+                                                TextStyle(color: Colors.blue),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                     ElevatedButton(
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.blue,

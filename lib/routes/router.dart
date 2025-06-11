@@ -3,7 +3,6 @@ import 'package:creativolabs/core/widgets/footer.dart';
 import 'package:creativolabs/core/widgets/site_logo.dart';
 import 'package:creativolabs/screens/about/view/about.dart';
 import 'package:creativolabs/screens/authwrapper/view/authwrapper.dart';
-import 'package:creativolabs/screens/changepassword/view/change_password.dart';
 import 'package:creativolabs/screens/contact/view/contact.dart';
 import 'package:creativolabs/screens/customers/view/create_customer.dart';
 import 'package:creativolabs/screens/customers/view/customers.dart';
@@ -428,23 +427,6 @@ final router = GoRouter(
         GoRoute(
           path: '/reset-password',
           builder: (context, state) => const ResetPassword(),
-        ),
-        GoRoute(
-          path: '/change-password',
-          builder: (context, state) {
-            final oobCode = state.uri.queryParameters['oobCode'];
-            if (oobCode == null || oobCode.isEmpty) {
-              return Center(
-                child: Text(
-                  'Código de recuperación no válido.',
-                  style: TextStyle(fontSize: 16, color: Colors.red),
-                ),
-              );
-            }
-            return ChangePassword(
-              oobCode: oobCode,
-            );
-          },
         ),
         GoRoute(
           path: '/about',

@@ -93,7 +93,7 @@ jobs:
       - name: Delete firebase_options.dart
         run: rm -f lib/firebase_options.dart
 
-      - name: create new main.dart
+      - name: Create new main.dart
         run: |
           mkdir -p lib
           cat <<EOF > lib/firebase_options.dart
@@ -157,7 +157,7 @@ jobs:
       - name: Delete pubspec.yaml
         run: rm -f pubspec.yaml
 
-      - name: Crear nuevo pubspec.yaml
+      - name: Create new pubspec.yaml
         run: |
           cat << 'EOF' > pubspec.yaml
           name: creativolabs
