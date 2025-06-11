@@ -1,4 +1,5 @@
 import 'package:creativolabs/api/customers_service.dart';
+import 'package:creativolabs/core/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -324,26 +325,9 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      await saveCustomer();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      textStyle: const TextStyle(fontSize: 16),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text('Guardar cliente'),
-                      ],
-                    ),
+                  Button(
+                    title: 'Guardar cliente',
+                    onPressed: () async => await saveCustomer(),
                   ),
                 ],
               ),

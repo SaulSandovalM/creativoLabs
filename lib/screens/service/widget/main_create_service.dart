@@ -1,4 +1,5 @@
 import 'package:creativolabs/api/service_service.dart';
+import 'package:creativolabs/core/widgets/button.dart';
 import 'package:creativolabs/providers/business_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -234,16 +235,7 @@ class _MainCreateServiceState extends State<MainCreateService> {
                 controlAffinity: ListTileControlAffinity.leading,
               ),
               const SizedBox(height: 25),
-              ElevatedButton.icon(
-                onPressed: saveService,
-                label: const Text('Guardar'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                ),
-              ),
+              Button(title: 'Guardar', onPressed: saveService),
             ],
           ),
         ),

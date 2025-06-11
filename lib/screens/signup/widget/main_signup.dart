@@ -1,4 +1,5 @@
 import 'package:creativolabs/core/constants/colors.dart';
+import 'package:creativolabs/core/widgets/button.dart';
 import 'package:creativolabs/core/widgets/container.dart';
 import 'package:creativolabs/api/business_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,58 +18,104 @@ class MainSignUp extends StatefulWidget {
 
 class MainSignUpState extends State<MainSignUp> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final BusinessService _businessService = BusinessService();
+  final _nameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _auth = FirebaseAuth.instance;
+  final _businessService = BusinessService();
+  bool _isLoading = false;
 
   Future<void> _register() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        // Crear usuario
-        UserCredential userCredential =
-            await _auth.createUserWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
+    if (!_formKey.currentState!.validate()) return;
 
-        final String userId = userCredential.user!.uid;
+    setState(() => _isLoading = true);
+    try {
+      final userCredential = await _auth.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
 
-        // Llamar a la función de creación del negocio
-        await _businessService.createBusinessForUser(
-          userId: userId,
-          name: _nameController.text.trim(),
-          lastName: _lastNameController.text.trim(),
-          email: _emailController.text.trim(),
-        );
+      final user = userCredential.user;
+      if (user == null) throw FirebaseAuthException(code: 'user-null');
 
-        // Enviar correo de verificación
-        await userCredential.user!.sendEmailVerification();
+      await _businessService.createBusinessForUser(
+        userId: user.uid,
+        name: _nameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+        email: _emailController.text.trim(),
+      );
 
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Registro exitoso. Revisa tu correo para verificar tu cuenta.',
-            ),
-          ),
-        );
-        context.go('/signin');
-      } catch (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
-      }
+      await user.sendEmailVerification();
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Registro exitoso. Revisa tu correo para verificar tu cuenta.'),
+        ),
+      );
+      context.go('/signin');
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  Widget _buildNameFields() {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildTextField(
+            controller: _nameController,
+            label: 'Nombre',
+            validatorMessage: 'Ingresa tu nombre',
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _buildTextField(
+            controller: _lastNameController,
+            label: 'Apellido',
+            validatorMessage: 'Ingresa tu apellido',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    String? validatorMessage,
+    bool obscureText = false,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+      validator: (value) {
+        if (value == null ||
+            value.isEmpty ||
+            (label == 'Contraseña' && value.length < 6)) {
+          return validatorMessage ?? 'Campo inválido';
+        }
+        return null;
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double availableHeight = screenHeight - widget.headerHeight;
+    final availableHeight =
+        MediaQuery.of(context).size.height - widget.headerHeight;
 
     return MainContainer(
       child: SizedBox(
@@ -78,170 +125,79 @@ class MainSignUpState extends State<MainSignUp> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.all(20.0),
+                child: Form(
+                  key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'REGISTRATE',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      const Text(
-                        'Crea una cuenta',
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const Text(
-                        'Llena el formulario para empezar',
-                        style: TextStyle(fontSize: 16),
+                      const Text('REGISTRATE', style: TextStyle(fontSize: 16)),
+                      const Text('Crea una cuenta',
+                          style: TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.bold)),
+                      const Text('Llena el formulario para empezar',
+                          style: TextStyle(fontSize: 16)),
+                      const SizedBox(height: 40),
+                      _buildNameFields(),
+                      const SizedBox(height: 40),
+                      _buildTextField(
+                        controller: _emailController,
+                        label: 'Correo electrónico',
+                        validatorMessage: 'Ingresa tu correo',
                       ),
                       const SizedBox(height: 40),
-                      Form(
-                        key: _formKey,
-                        child: Column(
+                      _buildTextField(
+                        controller: _passwordController,
+                        label: 'Contraseña',
+                        validatorMessage: 'Mínimo 6 caracteres',
+                        obscureText: true,
+                      ),
+                      const SizedBox(height: 40),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Text("¿Ya tienes una cuenta?"),
+                              TextButton(
+                                onPressed: () => context.go('/signin'),
+                                child: const Text("Entra.",
+                                    style: TextStyle(color: Colors.blue)),
+                              ),
+                            ],
+                          ),
+                          Button(
+                            title: 'Registrate',
+                            onPressed: _register,
+                            isLoading: _isLoading,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          style: const TextStyle(color: Colors.grey),
                           children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextFormField(
-                                    controller: _nameController,
-                                    decoration: const InputDecoration(
-                                      labelText: 'Nombre',
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Ingresa tu nombre';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: TextFormField(
-                                    controller: _lastNameController,
-                                    decoration: const InputDecoration(
-                                      labelText: 'Apellido',
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Ingresa tu apellido';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 40),
-                            TextFormField(
-                              controller: _emailController,
-                              decoration: const InputDecoration(
-                                labelText: 'Correo electrónico',
-                                border: OutlineInputBorder(),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Ingresa tu correo';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 40),
-                            TextFormField(
-                              controller: _passwordController,
-                              obscureText: true,
-                              decoration: const InputDecoration(
-                                labelText: 'Contraseña',
-                                border: OutlineInputBorder(),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.length < 6) {
-                                  return 'Mínimo 6 caracteres';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 40),
-                            Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Text("Ya tienes una cuenta?"),
-                                        TextButton(
-                                          onPressed: () {
-                                            context.go('/signin');
-                                          },
-                                          child: const Text(
-                                            "Entra  .",
-                                            style: TextStyle(
-                                              color: Colors.blue,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.blue,
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 40,
-                                          vertical: 15,
-                                        ),
-                                      ),
-                                      onPressed: _register,
-                                      child: const Text("Registrate"),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                                RichText(
-                                  textAlign: TextAlign.center,
-                                  text: TextSpan(
-                                    style: const TextStyle(color: Colors.grey),
-                                    children: [
-                                      const TextSpan(
-                                        text:
-                                            'Al hacer clic en "Registrate", aceptas los',
-                                      ),
-                                      TextSpan(
-                                        text:
-                                            ' términos y condiciones de nuestra empresa.',
-                                        style:
-                                            const TextStyle(color: Colors.blue),
-                                        recognizer: TapGestureRecognizer()
-                                          ..onTap = () {
-                                            context.go('/terms');
-                                          },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                            const TextSpan(
+                                text:
+                                    'Al hacer clic en "Registrate", aceptas los'),
+                            TextSpan(
+                              text:
+                                  ' términos y condiciones de nuestra empresa.',
+                              style: const TextStyle(color: Colors.blue),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () => context.go('/terms'),
                             ),
                           ],
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
               ),
             ),
-            Expanded(
-              child: Container(
-                color: CustomColor.navBarBg,
-              ),
-            )
+            Expanded(child: Container(color: CustomColor.navBarBg)),
           ],
         ),
       ),

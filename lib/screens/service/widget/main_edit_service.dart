@@ -1,4 +1,5 @@
 import 'package:creativolabs/api/service_service.dart';
+import 'package:creativolabs/core/widgets/button.dart';
 import 'package:creativolabs/providers/business_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -238,10 +239,10 @@ class _MainEditServiceState extends State<MainEditService> {
               controlAffinity: ListTileControlAffinity.leading,
             ),
             const SizedBox(height: 25),
-            ElevatedButton.icon(
+            Button(
+              title: 'Guardar cambios',
               onPressed: _saveChanges,
-              icon: const Icon(Icons.save),
-              label: const Text('Guardar cambios'),
+              icon: Icons.save,
             ),
           ],
         ),

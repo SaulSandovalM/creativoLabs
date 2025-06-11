@@ -1,6 +1,7 @@
 import 'package:creativolabs/api/customers_service.dart';
 import 'package:creativolabs/api/sales_service.dart';
 import 'package:creativolabs/api/service_service.dart';
+import 'package:creativolabs/core/widgets/button.dart';
 import 'package:creativolabs/providers/business_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -195,7 +196,6 @@ class _MainCreateSaleState extends State<MainCreateSale> {
       );
       return;
     }
-
     try {
       final double total = double.tryParse(
             _priceController.text.replaceAll(RegExp(r'[^\d.]'), ''),
@@ -218,12 +218,12 @@ class _MainCreateSaleState extends State<MainCreateSale> {
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Venta registrada exitosamente')),
+        const SnackBar(content: Text('Orden registrada exitosamente')),
       );
       context.go('/sales');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error al guardar la venta')),
+        const SnackBar(content: Text('Error al guardar la orden')),
       );
     }
   }
@@ -577,23 +577,27 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                           child: Column(
                             children: [
                               SizedBox(height: 10),
-                              ElevatedButton(
+                              // ElevatedButton(
+                              //   onPressed: _submitOrder,
+                              //   style: ElevatedButton.styleFrom(
+                              //     backgroundColor: Colors.blue,
+                              //     padding: const EdgeInsets.symmetric(
+                              //       horizontal: 30,
+                              //       vertical: 18,
+                              //     ),
+                              //   ),
+                              //   child: const Text(
+                              //     'Crear orden',
+                              //     style: TextStyle(
+                              //       color: Colors.white,
+                              //       fontWeight: FontWeight.w600,
+                              //     ),
+                              //   ),
+                              // ),
+                              Button(
+                                title: 'Crear orden',
                                 onPressed: _submitOrder,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 30,
-                                    vertical: 18,
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Crear orden',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
+                              )
                             ],
                           ),
                         ),

@@ -1,3 +1,4 @@
+import 'package:creativolabs/core/widgets/button.dart';
 import 'package:creativolabs/core/widgets/container.dart';
 import 'package:creativolabs/screens/customers/widget/main_customers.dart';
 import 'package:flutter/material.dart';
@@ -22,20 +23,14 @@ class Customers extends StatelessWidget {
                   fontSize: 30,
                 ),
               ),
-              ElevatedButton.icon(
-                onPressed: () {
-                  context.go('/create-customer');
-                },
-                icon: Icon(Icons.add),
-                label: Text('Agregar'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
+              Button(
+                title: 'Agregar',
+                onPressed: () => context.go('/create-customer'),
+                icon: Icons.add,
               ),
             ],
           ),
+          SizedBox(height: 20),
           MainCustomers(headerHeight: 60),
           SizedBox(height: 40),
         ],

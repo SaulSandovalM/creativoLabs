@@ -1,4 +1,5 @@
 import 'package:creativolabs/core/constants/colors.dart';
+import 'package:creativolabs/core/widgets/button.dart';
 import 'package:creativolabs/core/widgets/container.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
@@ -187,21 +188,10 @@ class MainSignInState extends State<MainSignIn> {
                                         ),
                                       ],
                                     ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.blue,
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 40,
-                                          vertical: 15,
-                                        ),
-                                      ),
-                                      onPressed: _isLoading ? null : _signIn,
-                                      child: _isLoading
-                                          ? const CircularProgressIndicator(
-                                              color: Colors.white,
-                                            )
-                                          : const Text("Entrar"),
+                                    Button(
+                                      title: 'Entrar',
+                                      onPressed: _signIn,
+                                      isLoading: _isLoading,
                                     ),
                                   ],
                                 ),

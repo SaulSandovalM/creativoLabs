@@ -1,3 +1,4 @@
+import 'package:creativolabs/core/widgets/button.dart';
 import 'package:creativolabs/core/widgets/container.dart';
 import 'package:creativolabs/screens/sales/widget/main_sales.dart';
 import 'package:flutter/material.dart';
@@ -22,20 +23,14 @@ class Sales extends StatelessWidget {
                   fontSize: 30,
                 ),
               ),
-              ElevatedButton.icon(
-                onPressed: () {
-                  context.go('/create-sales');
-                },
-                icon: Icon(Icons.add),
-                label: Text('Agregar'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-              ),
+              Button(
+                title: "Agregar",
+                onPressed: () => context.go('/create-sales'),
+                icon: Icons.add,
+              )
             ],
           ),
+          SizedBox(height: 20),
           MainSales(headerHeight: 60),
           SizedBox(height: 40),
         ],
