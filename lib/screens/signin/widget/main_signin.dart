@@ -1,6 +1,7 @@
 import 'package:creativolabs/core/constants/colors.dart';
 import 'package:creativolabs/core/widgets/button.dart';
 import 'package:creativolabs/core/widgets/container.dart';
+import 'package:creativolabs/core/widgets/input.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
@@ -69,19 +70,6 @@ class MainSignInState extends State<MainSignIn> {
     );
   }
 
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Ingresa tu correo';
-    }
-    final RegExp emailRegex = RegExp(
-      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-    );
-    if (!emailRegex.hasMatch(value)) {
-      return 'Ingresa un correo electrónico válido';
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -125,13 +113,19 @@ class MainSignInState extends State<MainSignIn> {
                         child: Column(
                           children: [
                             const SizedBox(height: 40),
-                            TextFormField(
+                            Input(
                               controller: _emailController,
-                              decoration: const InputDecoration(
-                                labelText: 'Correo electrónico',
-                                border: OutlineInputBorder(),
-                              ),
-                              validator: _validateEmail,
+                              label: 'Correo electrónico',
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Ingresa tu correo';
+                                }
+                                if (!value.contains('@')) {
+                                  return 'Correo inválido';
+                                }
+                                return null;
+                              },
                             ),
                             const SizedBox(height: 20),
                             Row(
@@ -151,19 +145,11 @@ class MainSignInState extends State<MainSignIn> {
                               ],
                             ),
                             const SizedBox(height: 10),
-                            TextFormField(
+                            Input(
                               controller: _passwordController,
+                              label: 'Contraseña',
                               obscureText: true,
-                              decoration: const InputDecoration(
-                                labelText: 'Contraseña',
-                                border: OutlineInputBorder(),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Ingresa tu contraseña';
-                                }
-                                return null;
-                              },
+                              minLength: 6,
                             ),
                             const SizedBox(height: 40),
                             Column(

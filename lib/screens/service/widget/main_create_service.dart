@@ -1,9 +1,9 @@
 import 'package:creativolabs/api/service_service.dart';
 import 'package:creativolabs/core/widgets/button.dart';
+import 'package:creativolabs/core/widgets/input.dart';
+import 'package:creativolabs/core/widgets/multi_select.dart';
 import 'package:creativolabs/providers/business_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -149,42 +149,26 @@ class _MainCreateServiceState extends State<MainCreateService> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextFormField(
+              Input(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre del servicio',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingresa el nombre';
-                  }
-                  return null;
-                },
+                label: 'Nombre del servicio',
               ),
               const SizedBox(height: 25),
-              TextFormField(
+              Input(
                 controller: _priceController,
+                label: 'Precio',
                 keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  CurrencyInputFormatter(),
-                ],
+                isCurrency: true,
                 decoration: const InputDecoration(
                   labelText: 'Precio',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.attach_money),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingrese un precio';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 25),
-              TextFormField(
+              Input(
                 controller: _descriptionController,
+                label: 'Descripción',
                 maxLines: 5,
                 textAlignVertical: TextAlignVertical.top,
                 decoration: const InputDecoration(
@@ -192,34 +176,12 @@ class _MainCreateServiceState extends State<MainCreateService> {
                   alignLabelWithHint: true,
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingrese una descripción';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 25),
-              GestureDetector(
+              MultiSelect(
                 onTap: _mostrarSelectorCategorias,
-                child: AbsorbPointer(
-                  child: TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Categorías',
-                      border: OutlineInputBorder(),
-                    ),
-                    controller: TextEditingController(
-                      text: _categoriasSeleccionadas.join(', '),
-                    ),
-                    validator: (value) {
-                      if (_categoriasSeleccionadas.isEmpty) {
-                        return 'Por favor selecciona al menos una categoría';
-                      }
-                      return null;
-                    },
-                    readOnly: true,
-                  ),
-                ),
+                selectedCategories: _categoriasSeleccionadas,
+                labelText: 'Categorías',
               ),
               const SizedBox(height: 25),
               CheckboxListTile(
@@ -235,36 +197,14 @@ class _MainCreateServiceState extends State<MainCreateService> {
                 controlAffinity: ListTileControlAffinity.leading,
               ),
               const SizedBox(height: 25),
-              Button(title: 'Guardar', onPressed: saveService),
+              Button(
+                title: 'Guardar',
+                onPressed: saveService,
+              ),
             ],
           ),
         ),
       ),
-    );
-  }
-}
-
-// Clase personalizada para formatear como moneda
-class CurrencyInputFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    if (newValue.text.isEmpty) {
-      return newValue.copyWith(text: '');
-    }
-
-    final int value = int.parse(newValue.text.replaceAll(',', ''));
-    final String newText = NumberFormat.currency(
-      locale: 'es_MX',
-      symbol: '',
-      decimalDigits: 0,
-    ).format(value);
-
-    return newValue.copyWith(
-      text: newText,
-      selection: TextSelection.collapsed(offset: newText.length),
     );
   }
 }

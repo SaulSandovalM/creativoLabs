@@ -2,6 +2,8 @@ import 'package:creativolabs/api/customers_service.dart';
 import 'package:creativolabs/api/sales_service.dart';
 import 'package:creativolabs/api/service_service.dart';
 import 'package:creativolabs/core/widgets/button.dart';
+import 'package:creativolabs/core/widgets/input.dart';
+import 'package:creativolabs/core/widgets/select.dart';
 import 'package:creativolabs/providers/business_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -116,7 +118,6 @@ class _MainCreateSaleState extends State<MainCreateSale> {
           }
         });
       }, onError: (error) {
-        debugPrint('Error al cargar clientes: $error');
         setState(() {
           clientes = [];
           clienteSeleccionado = null;
@@ -133,7 +134,6 @@ class _MainCreateSaleState extends State<MainCreateSale> {
   Future<void> _generarNumeroOrden() async {
     if (businessId == null) return;
     int nextOrderNumber = await _salesService.getLastSalesNumber(businessId!);
-    debugPrint('Next order number: $nextOrderNumber');
     setState(() {
       _orderNumberController.text = nextOrderNumber.toString();
     });
@@ -151,7 +151,6 @@ class _MainCreateSaleState extends State<MainCreateSale> {
       lastDate: DateTime(2100),
       locale: const Locale('es', 'ES'),
     );
-
     if (selectedDate != null) {
       _dateController.text = formatDate(selectedDate);
     }
@@ -175,7 +174,6 @@ class _MainCreateSaleState extends State<MainCreateSale> {
         }
       });
     }, onError: (error) {
-      debugPrint('Error al cargar servicios: $error');
       setState(() {
         servicios = [];
         servicioSeleccionado = null;
@@ -262,7 +260,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: DropdownButtonFormField<String>(
+                    child: Select<String>(
                       value: clienteSeleccionado,
                       decoration: const InputDecoration(
                         labelText: 'Cliente',
@@ -298,13 +296,10 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                   ),
                   const SizedBox(width: 25),
                   Expanded(
-                    child: TextFormField(
+                    child: Input(
                       controller: _orderNumberController,
+                      label: 'Orden',
                       readOnly: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Orden',
-                        border: OutlineInputBorder(),
-                      ),
                     ),
                   ),
                 ],
@@ -314,39 +309,27 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: TextFormField(
+                    child: Input(
                       controller: _dateController,
+                      label: 'Día',
                       decoration: const InputDecoration(
                         labelText: 'Día',
                         border: OutlineInputBorder(),
                         suffixIcon: Icon(Icons.calendar_month),
                       ),
-                      readOnly: true,
                       onTap: () => _selectDate(context),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor selecciona un día';
-                        }
-                        return null;
-                      },
                     ),
                   ),
                   const SizedBox(width: 25),
                   Expanded(
-                    child: TextFormField(
+                    child: Input(
                       controller: _timeController,
-                      readOnly: true,
+                      label: 'Hora',
                       decoration: const InputDecoration(
                         labelText: 'Hora',
                         border: OutlineInputBorder(),
                         suffixIcon: Icon(Icons.access_time),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor selecciona una hora';
-                        }
-                        return null;
-                      },
                       onTap: () async {
                         TimeOfDay? pickedTime = await showTimePicker(
                           context: context,
@@ -378,7 +361,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
               Row(
                 children: [
                   Expanded(
-                    child: DropdownButtonFormField<String>(
+                    child: Select<String>(
                       value: estadoSeleccionado,
                       decoration: const InputDecoration(
                         labelText: 'Estado',
@@ -405,18 +388,9 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                   ),
                   const SizedBox(width: 25),
                   Expanded(
-                    child: TextFormField(
+                    child: Input(
                       controller: _cityController,
-                      decoration: const InputDecoration(
-                        labelText: 'Ciudad',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese una ciudad';
-                        }
-                        return null;
-                      },
+                      label: 'Ciudad',
                     ),
                   ),
                 ],
@@ -425,42 +399,22 @@ class _MainCreateSaleState extends State<MainCreateSale> {
               Row(
                 children: [
                   Expanded(
-                    child: TextFormField(
+                    child: Input(
                       controller: _addressController,
-                      decoration: const InputDecoration(
-                        labelText: 'Dirección',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese una dirección';
-                        }
-                        return null;
-                      },
+                      label: 'Dirección',
                     ),
                   ),
                   const SizedBox(width: 25),
                   Expanded(
-                    child: TextFormField(
+                    child: Input(
                       controller: _cpController,
+                      label: 'CP',
                       keyboardType: TextInputType.number,
+                      minLength: 5,
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly,
                         LengthLimitingTextInputFormatter(5),
                       ],
-                      decoration: const InputDecoration(
-                        labelText: 'CP',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese un código postal';
-                        }
-                        if (value.length != 5) {
-                          return 'El código postal debe tener 5 dígitos';
-                        }
-                        return null;
-                      },
                     ),
                   ),
                 ],
@@ -481,8 +435,9 @@ class _MainCreateSaleState extends State<MainCreateSale> {
               Row(
                 children: [
                   Expanded(
-                    child: TextFormField(
+                    child: Input(
                       controller: _noteController,
+                      label: 'Nota',
                       maxLines: 5,
                       textAlignVertical: TextAlignVertical.top,
                       decoration: const InputDecoration(
@@ -490,12 +445,6 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                         alignLabelWithHint: true,
                         border: OutlineInputBorder(),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese una nota';
-                        }
-                        return null;
-                      },
                     ),
                   ),
                 ],
@@ -543,25 +492,17 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                   ),
                   const SizedBox(width: 25),
                   Expanded(
-                    child: TextFormField(
+                    child: Input(
                       controller: _priceController,
+                      label: 'Total',
                       readOnly: true,
                       keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        CurrencyInputFormatter(),
-                      ],
+                      isCurrency: true,
                       decoration: const InputDecoration(
                         labelText: 'Total',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.attach_money),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese un precio';
-                        }
-                        return null;
-                      },
                     ),
                   ),
                 ],
@@ -571,38 +512,11 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Column(
-                      children: [
-                        SizedBox(
-                          child: Column(
-                            children: [
-                              SizedBox(height: 10),
-                              // ElevatedButton(
-                              //   onPressed: _submitOrder,
-                              //   style: ElevatedButton.styleFrom(
-                              //     backgroundColor: Colors.blue,
-                              //     padding: const EdgeInsets.symmetric(
-                              //       horizontal: 30,
-                              //       vertical: 18,
-                              //     ),
-                              //   ),
-                              //   child: const Text(
-                              //     'Crear orden',
-                              //     style: TextStyle(
-                              //       color: Colors.white,
-                              //       fontWeight: FontWeight.w600,
-                              //     ),
-                              //   ),
-                              // ),
-                              Button(
-                                title: 'Crear orden',
-                                onPressed: _submitOrder,
-                              )
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                    SizedBox(height: 10),
+                    Button(
+                      title: 'Crear orden',
+                      onPressed: _submitOrder,
+                    )
                   ],
                 ),
               ),

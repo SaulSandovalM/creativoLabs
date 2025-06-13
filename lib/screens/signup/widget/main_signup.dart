@@ -2,6 +2,7 @@ import 'package:creativolabs/core/constants/colors.dart';
 import 'package:creativolabs/core/widgets/button.dart';
 import 'package:creativolabs/core/widgets/container.dart';
 import 'package:creativolabs/api/business_service.dart';
+import 'package:creativolabs/core/widgets/input.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -35,24 +36,21 @@ class MainSignUpState extends State<MainSignUp> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-
       final user = userCredential.user;
       if (user == null) throw FirebaseAuthException(code: 'user-null');
-
       await _businessService.createBusinessForUser(
         userId: user.uid,
         name: _nameController.text.trim(),
         lastName: _lastNameController.text.trim(),
         email: _emailController.text.trim(),
       );
-
       await user.sendEmailVerification();
-
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-              'Registro exitoso. Revisa tu correo para verificar tu cuenta.'),
+            'Registro exitoso. Revisa tu correo para verificar tu cuenta.',
+          ),
         ),
       );
       context.go('/signin');
@@ -64,52 +62,6 @@ class MainSignUpState extends State<MainSignUp> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  Widget _buildNameFields() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildTextField(
-            controller: _nameController,
-            label: 'Nombre',
-            validatorMessage: 'Ingresa tu nombre',
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _buildTextField(
-            controller: _lastNameController,
-            label: 'Apellido',
-            validatorMessage: 'Ingresa tu apellido',
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    String? validatorMessage,
-    bool obscureText = false,
-  }) {
-    return TextFormField(
-      controller: controller,
-      obscureText: obscureText,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-      validator: (value) {
-        if (value == null ||
-            value.isEmpty ||
-            (label == 'Contraseña' && value.length < 6)) {
-          return validatorMessage ?? 'Campo inválido';
-        }
-        return null;
-      },
-    );
   }
 
   @override
@@ -132,25 +84,56 @@ class MainSignUpState extends State<MainSignUp> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text('REGISTRATE', style: TextStyle(fontSize: 16)),
-                      const Text('Crea una cuenta',
-                          style: TextStyle(
-                              fontSize: 30, fontWeight: FontWeight.bold)),
-                      const Text('Llena el formulario para empezar',
-                          style: TextStyle(fontSize: 16)),
-                      const SizedBox(height: 40),
-                      _buildNameFields(),
-                      const SizedBox(height: 40),
-                      _buildTextField(
-                        controller: _emailController,
-                        label: 'Correo electrónico',
-                        validatorMessage: 'Ingresa tu correo',
+                      const Text(
+                        'Crea una cuenta',
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Text(
+                        'Llena el formulario para empezar',
+                        style: TextStyle(fontSize: 16),
                       ),
                       const SizedBox(height: 40),
-                      _buildTextField(
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Input(
+                              controller: _nameController,
+                              label: 'Nombre',
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Input(
+                              controller: _lastNameController,
+                              label: 'Apellido',
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 40),
+                      Input(
+                        controller: _emailController,
+                        label: 'Correo electrónico',
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ingresa tu correo';
+                          }
+                          if (!value.contains('@')) {
+                            return 'Correo inválido';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 40),
+                      Input(
                         controller: _passwordController,
                         label: 'Contraseña',
-                        validatorMessage: 'Mínimo 6 caracteres',
                         obscureText: true,
+                        minLength: 6,
                       ),
                       const SizedBox(height: 40),
                       Row(
@@ -180,8 +163,9 @@ class MainSignUpState extends State<MainSignUp> {
                           style: const TextStyle(color: Colors.grey),
                           children: [
                             const TextSpan(
-                                text:
-                                    'Al hacer clic en "Registrate", aceptas los'),
+                              text:
+                                  'Al hacer clic en "Registrate", aceptas los',
+                            ),
                             TextSpan(
                               text:
                                   ' términos y condiciones de nuestra empresa.',
