@@ -1,3 +1,4 @@
+import 'package:creativolabs/core/widgets/back_buttons.dart';
 import 'package:creativolabs/core/widgets/container.dart';
 import 'package:creativolabs/screens/customers/widget/main_create_customer.dart';
 import 'package:flutter/material.dart';
@@ -18,19 +19,10 @@ class CreateCustomer extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      context.go('/customers');
-                    },
-                    icon: const Icon(Icons.arrow_back),
-                    label: const Text('Clientes'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                      elevation: 0,
-                    ),
+                  BackButtons(
+                    title: 'Clientes',
+                    onPressed: () => context.go('/customers'),
+                    icon: Icons.arrow_back,
                   ),
                   SizedBox(height: 30),
                   Text(

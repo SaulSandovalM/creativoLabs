@@ -38,8 +38,6 @@ final router = GoRouter(
       '/services',
       '/terms',
       '/politics',
-      '/reset-password',
-      '/change-password',
     ];
     if (user == null && !publicRoutes.any((path) => state.uri.path == path)) {
       return '/home';

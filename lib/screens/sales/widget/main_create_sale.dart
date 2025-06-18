@@ -23,56 +23,22 @@ class _MainCreateSaleState extends State<MainCreateSale> {
 
   List<Map<String, dynamic>> clientes = [];
   List<Map<String, dynamic>> servicios = [];
-  List<String> estados = [
-    'Aguascalientes',
-    'Baja California',
-    'Baja California Sur',
-    'Campeche',
-    'Chiapas',
-    'Chihuahua',
-    'Ciudad de México',
-    'Coahuila',
-    'Colima',
-    'Durango',
-    'Estado de México',
-    'Guanajuato',
-    'Guerrero',
-    'Hidalgo',
-    'Jalisco',
-    'Michoacán',
-    'Morelos',
-    'Nayarit',
-    'Nuevo León',
-    'Oaxaca',
-    'Puebla',
-    'Querétaro',
-    'Quintana Roo',
-    'San Luis Potosí',
-    'Sinaloa',
-    'Sonora',
-    'Tabasco',
-    'Tamaulipas',
-    'Tlaxcala',
-    'Veracruz',
-    'Yucatán',
-    'Zacatecas'
-  ];
 
   String? servicioSeleccionado;
+  String? selectedPaymentMethod;
   String? clienteSeleccionado;
   String? customerId;
   String? businessId;
-  String? estadoSeleccionado;
 
   final _priceController = TextEditingController();
   final TextEditingController _orderNumberController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
+  final TextEditingController _stateController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _cpController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
-
   final CustomersService _customersService = CustomersService();
   final SalesService _salesService = SalesService();
   final ServiceService _serviceService = ServiceService();
@@ -108,14 +74,6 @@ class _MainCreateSaleState extends State<MainCreateSale> {
         }).toList();
         setState(() {
           clientes = clientesList;
-          if (clientes.isNotEmpty) {
-            customerId = clientes.first['id'];
-            clienteSeleccionado = clientes.first['name'];
-            estadoSeleccionado = clientes.first['state'];
-            _cityController.text = clientes.first['city'];
-            _addressController.text = clientes.first['address'];
-            _cpController.text = clientes.first['cp'];
-          }
         });
       }, onError: (error) {
         setState(() {
@@ -168,10 +126,6 @@ class _MainCreateSaleState extends State<MainCreateSale> {
       }).toList();
       setState(() {
         servicios = serviciosData;
-        if (servicios.isNotEmpty) {
-          servicioSeleccionado = servicios.first['name'];
-          _priceController.text = servicios.first['price'].toString();
-        }
       });
     }, onError: (error) {
       setState(() {
@@ -206,7 +160,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
         orderNumber: int.parse(_orderNumberController.text),
         date: _dateController.text,
         time: _timeController.text,
-        state: estadoSeleccionado!,
+        state: _stateController.text,
         city: _cityController.text,
         address: _addressController.text,
         cp: _cpController.text,
@@ -280,7 +234,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                         setState(() {
                           customerId = cliente['id'];
                           clienteSeleccionado = nuevoCliente;
-                          estadoSeleccionado = cliente['state'];
+                          _stateController.text = cliente['state'];
                           _cityController.text = cliente['city'];
                           _addressController.text = cliente['address'];
                           _cpController.text = cliente['cp'];
@@ -361,29 +315,9 @@ class _MainCreateSaleState extends State<MainCreateSale> {
               Row(
                 children: [
                   Expanded(
-                    child: Select<String>(
-                      value: estadoSeleccionado,
-                      decoration: const InputDecoration(
-                        labelText: 'Estado',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: estados.map((String estado) {
-                        return DropdownMenuItem<String>(
-                          value: estado,
-                          child: Text(estado),
-                        );
-                      }).toList(),
-                      onChanged: (String? nuevoEstado) {
-                        setState(() {
-                          estadoSeleccionado = nuevoEstado;
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor seleccione un estado';
-                        }
-                        return null;
-                      },
+                    child: Input(
+                      controller: _stateController,
+                      label: 'Estado',
                     ),
                   ),
                   const SizedBox(width: 25),
@@ -454,31 +388,36 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                 thickness: 1,
                 height: 40,
               ),
+              const Text(
+                'Servicio',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 18,
+                ),
+              ),
               const SizedBox(height: 25),
               Row(
                 children: [
                   Expanded(
-                    child: DropdownButtonFormField<String>(
+                    child: Select<String>(
                       value: servicioSeleccionado,
-                      decoration: const InputDecoration(
-                        labelText: 'Servicio',
-                        border: OutlineInputBorder(),
-                      ),
                       items: servicios.map((servicio) {
                         return DropdownMenuItem<String>(
                           value: servicio['name'],
                           child: Text(servicio['name']),
                         );
                       }).toList(),
+                      decoration: const InputDecoration(
+                        labelText: 'Servicio',
+                        border: OutlineInputBorder(),
+                      ),
                       onChanged: (String? nuevoServicio) {
                         setState(() {
                           servicioSeleccionado = nuevoServicio;
-
                           final servicio = servicios.firstWhere(
                             (s) => s['name'] == nuevoServicio,
                             orElse: () => {'price': 0},
                           );
-
                           _priceController.text = servicio['price'].toString();
                         });
                       },
@@ -492,17 +431,61 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                   ),
                   const SizedBox(width: 25),
                   Expanded(
-                    child: Input(
-                      controller: _priceController,
-                      label: 'Total',
-                      readOnly: true,
-                      keyboardType: TextInputType.number,
-                      isCurrency: true,
+                    child: Select<String>(
+                      value: selectedPaymentMethod,
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'Efectivo',
+                          child: Text('Efectivo'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Tarjeta',
+                          child: Text('Tarjeta'),
+                        ),
+                      ],
                       decoration: const InputDecoration(
-                        labelText: 'Total',
+                        labelText: 'Método de pago',
                         border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.attach_money),
                       ),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedPaymentMethod = newValue;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor seleccione un método de pago';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 25),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SizedBox(
+                    width: 300,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '\$${(double.tryParse(_priceController.text.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0.0).toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      ],
                     ),
                   ),
                 ],
@@ -524,31 +507,6 @@ class _MainCreateSaleState extends State<MainCreateSale> {
           ),
         ),
       ),
-    );
-  }
-}
-
-// Clase personalizada para formatear como moneda
-class CurrencyInputFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    if (newValue.text.isEmpty) {
-      return newValue.copyWith(text: '');
-    }
-
-    final int value = int.parse(newValue.text.replaceAll(',', ''));
-    final String newText = NumberFormat.currency(
-      locale: 'es_MX',
-      symbol: '',
-      decimalDigits: 0,
-    ).format(value);
-
-    return newValue.copyWith(
-      text: newText,
-      selection: TextSelection.collapsed(offset: newText.length),
     );
   }
 }

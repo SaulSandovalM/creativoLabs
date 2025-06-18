@@ -1,3 +1,4 @@
+import 'package:creativolabs/core/widgets/back_buttons.dart';
 import 'package:creativolabs/core/widgets/custom_card.dart';
 import 'package:creativolabs/core/widgets/container.dart';
 import 'package:creativolabs/screens/customers/widget/main_detail_customer.dart';
@@ -50,19 +51,10 @@ class DetailCustomer extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      context.go('/customers');
-                    },
-                    icon: const Icon(Icons.arrow_back),
-                    label: const Text('Clientes'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[200],
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                      elevation: 0,
-                    ),
+                  BackButtons(
+                    title: 'Clientes',
+                    onPressed: () => context.go('/customers'),
+                    icon: Icons.arrow_back,
                   ),
                 ],
               ),
