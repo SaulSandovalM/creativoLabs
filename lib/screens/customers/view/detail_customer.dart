@@ -1,19 +1,32 @@
 import 'package:creativolabs/core/widgets/back_buttons.dart';
 import 'package:creativolabs/core/widgets/custom_card.dart';
 import 'package:creativolabs/core/widgets/container.dart';
+import 'package:creativolabs/providers/business_model.dart';
 import 'package:creativolabs/screens/customers/widget/main_detail_customer.dart';
 import 'package:creativolabs/api/customers_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class DetailCustomer extends StatelessWidget {
-  final String? id;
-  const DetailCustomer({super.key, required this.id});
+  final String? customerId;
+
+  const DetailCustomer({super.key, required this.customerId});
 
   @override
   Widget build(BuildContext context) {
-    if (id == null) {
-      return const Center(child: Text('ID no válido'));
+    final businessModel = context.watch<BusinessModel>();
+
+    // Mostrar cargando mientras el modelo está en proceso
+    if (businessModel.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final businessId = businessModel.businessId;
+
+    // Validación de datos necesarios
+    if (businessId == null || customerId == null) {
+      return const Center(child: Text('ID de negocio o cliente no válido'));
     }
 
     final customerService = CustomersService();
@@ -32,7 +45,10 @@ class DetailCustomer extends StatelessWidget {
     ];
 
     return FutureBuilder<Map<String, dynamic>?>(
-      future: customerService.getCustomerById(id!),
+      future: customerService.getCustomerById(
+        businessId: businessId,
+        customerId: customerId!,
+      ),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -199,9 +215,9 @@ class DetailCustomer extends StatelessWidget {
                                     children: [
                                       ElevatedButton(
                                         onPressed: () async {
-                                          if (id != null) {
-                                            await CustomersService()
-                                                .deleteCustomerById(id!);
+                                          if (customerId != null) {
+                                            // await CustomersService()
+                                            //     .deleteCustomerById(id!);
                                           }
                                         },
                                         style: ElevatedButton.styleFrom(

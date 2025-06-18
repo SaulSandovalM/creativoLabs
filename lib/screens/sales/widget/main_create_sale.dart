@@ -21,12 +21,12 @@ class MainCreateSale extends StatefulWidget {
 class _MainCreateSaleState extends State<MainCreateSale> {
   final _formKey = GlobalKey<FormState>();
 
-  List<Map<String, dynamic>> clientes = [];
-  List<Map<String, dynamic>> servicios = [];
+  List<Map<String, dynamic>> customers = [];
+  List<Map<String, dynamic>> services = [];
 
-  String? servicioSeleccionado;
+  String? serviceSelected;
   String? selectedPaymentMethod;
-  String? clienteSeleccionado;
+  String? customerSelected;
   String? customerId;
   String? businessId;
 
@@ -50,12 +50,12 @@ class _MainCreateSaleState extends State<MainCreateSale> {
     super.initState();
     final model = Provider.of<BusinessModel>(context, listen: false);
     businessId = model.businessId;
-    _cargarClientes();
-    _generarNumeroOrden();
-    _cargarServicios();
+    _loadCustomers();
+    _generateOrderNumber();
+    _loadServices();
   }
 
-  Future<void> _cargarClientes() async {
+  Future<void> _loadCustomers() async {
     try {
       final stream =
           _customersService.getCustomersStreamByBusiness(businessId!);
@@ -73,23 +73,23 @@ class _MainCreateSaleState extends State<MainCreateSale> {
           };
         }).toList();
         setState(() {
-          clientes = clientesList;
+          customers = clientesList;
         });
       }, onError: (error) {
         setState(() {
-          clientes = [];
-          clienteSeleccionado = null;
+          customers = [];
+          customerSelected = null;
         });
       });
     } catch (e) {
       setState(() {
-        clientes = [];
-        clienteSeleccionado = null;
+        customers = [];
+        customerSelected = null;
       });
     }
   }
 
-  Future<void> _generarNumeroOrden() async {
+  Future<void> _generateOrderNumber() async {
     if (businessId == null) return;
     int nextOrderNumber = await _salesService.getLastSalesNumber(businessId!);
     setState(() {
@@ -114,10 +114,10 @@ class _MainCreateSaleState extends State<MainCreateSale> {
     }
   }
 
-  Future<void> _cargarServicios() async {
+  Future<void> _loadServices() async {
     final stream = _serviceService.getServiceStreamByBusiness(businessId!);
     stream.listen((snapshot) {
-      final List<Map<String, dynamic>> serviciosData = snapshot.docs.map((doc) {
+      final List<Map<String, dynamic>> dataService = snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
         return {
           'name': data['name'],
@@ -125,12 +125,12 @@ class _MainCreateSaleState extends State<MainCreateSale> {
         };
       }).toList();
       setState(() {
-        servicios = serviciosData;
+        services = dataService;
       });
     }, onError: (error) {
       setState(() {
-        servicios = [];
-        servicioSeleccionado = null;
+        services = [];
+        serviceSelected = null;
         _priceController.clear();
       });
     });
@@ -139,8 +139,8 @@ class _MainCreateSaleState extends State<MainCreateSale> {
   Future<void> _submitOrder() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     if (businessId == null ||
-        clienteSeleccionado == null ||
-        servicioSeleccionado == null) {
+        customerSelected == null ||
+        serviceSelected == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Faltan datos importantes para guardar la orden'),
@@ -156,7 +156,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
       await _salesService.saveSale(
         businessId: businessId!,
         customerId: customerId ?? '',
-        customerName: clienteSeleccionado!,
+        customerName: customerSelected!,
         orderNumber: int.parse(_orderNumberController.text),
         date: _dateController.text,
         time: _timeController.text,
@@ -164,7 +164,8 @@ class _MainCreateSaleState extends State<MainCreateSale> {
         city: _cityController.text,
         address: _addressController.text,
         cp: _cpController.text,
-        service: servicioSeleccionado!,
+        service: serviceSelected!,
+        paymentMethod: selectedPaymentMethod!,
         price: total,
         note: _noteController.text,
       );
@@ -215,29 +216,29 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                 children: [
                   Expanded(
                     child: Select<String>(
-                      value: clienteSeleccionado,
+                      value: customerSelected,
                       decoration: const InputDecoration(
                         labelText: 'Cliente',
                         border: OutlineInputBorder(),
                       ),
-                      items: clientes.map((cliente) {
+                      items: customers.map((customer) {
                         return DropdownMenuItem<String>(
-                          value: cliente['name'],
-                          child: Text(cliente['name']),
+                          value: customer['name'],
+                          child: Text(customer['name']),
                         );
                       }).toList(),
                       onChanged: (String? nuevoCliente) {
-                        final cliente = clientes.firstWhere(
+                        final customer = customers.firstWhere(
                           (c) => c['name'] == nuevoCliente,
                           orElse: () => {},
                         );
                         setState(() {
-                          customerId = cliente['id'];
-                          clienteSeleccionado = nuevoCliente;
-                          _stateController.text = cliente['state'];
-                          _cityController.text = cliente['city'];
-                          _addressController.text = cliente['address'];
-                          _cpController.text = cliente['cp'];
+                          customerId = customer['id'];
+                          customerSelected = nuevoCliente;
+                          _stateController.text = customer['state'];
+                          _cityController.text = customer['city'];
+                          _addressController.text = customer['address'];
+                          _cpController.text = customer['cp'];
                         });
                       },
                       validator: (value) {
@@ -318,6 +319,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                     child: Input(
                       controller: _stateController,
                       label: 'Estado',
+                      readOnly: true,
                     ),
                   ),
                   const SizedBox(width: 25),
@@ -325,6 +327,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                     child: Input(
                       controller: _cityController,
                       label: 'Ciudad',
+                      readOnly: true,
                     ),
                   ),
                 ],
@@ -336,6 +339,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                     child: Input(
                       controller: _addressController,
                       label: 'Dirección',
+                      readOnly: true,
                     ),
                   ),
                   const SizedBox(width: 25),
@@ -349,6 +353,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                         FilteringTextInputFormatter.digitsOnly,
                         LengthLimitingTextInputFormatter(5),
                       ],
+                      readOnly: true,
                     ),
                   ),
                 ],
@@ -400,11 +405,11 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                 children: [
                   Expanded(
                     child: Select<String>(
-                      value: servicioSeleccionado,
-                      items: servicios.map((servicio) {
+                      value: serviceSelected,
+                      items: services.map((service) {
                         return DropdownMenuItem<String>(
-                          value: servicio['name'],
-                          child: Text(servicio['name']),
+                          value: service['name'],
+                          child: Text(service['name']),
                         );
                       }).toList(),
                       decoration: const InputDecoration(
@@ -413,12 +418,12 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                       ),
                       onChanged: (String? nuevoServicio) {
                         setState(() {
-                          servicioSeleccionado = nuevoServicio;
-                          final servicio = servicios.firstWhere(
+                          serviceSelected = nuevoServicio;
+                          final service = services.firstWhere(
                             (s) => s['name'] == nuevoServicio,
                             orElse: () => {'price': 0},
                           );
-                          _priceController.text = servicio['price'].toString();
+                          _priceController.text = service['price'].toString();
                         });
                       },
                       validator: (value) {

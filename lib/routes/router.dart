@@ -7,6 +7,7 @@ import 'package:creativolabs/screens/contact/view/contact.dart';
 import 'package:creativolabs/screens/customers/view/create_customer.dart';
 import 'package:creativolabs/screens/customers/view/customers.dart';
 import 'package:creativolabs/screens/customers/view/detail_customer.dart';
+import 'package:creativolabs/screens/customers/view/edit_customer.dart';
 import 'package:creativolabs/screens/dashboard/view/dashboard.dart';
 import 'package:creativolabs/screens/home/view/home.dart';
 import 'package:creativolabs/screens/politics/view/politics.dart';
@@ -487,6 +488,15 @@ final router = GoRouter(
           redirect: (context, state) => _requireAuth(),
         ),
         GoRoute(
+          path: '/edit-customer/:customerId',
+          name: 'edit-customer',
+          builder: (context, state) {
+            final customerId = state.pathParameters['customerId']!;
+            return EditCustomer(customerId: customerId);
+          },
+          redirect: (context, state) => _requireAuth(),
+        ),
+        GoRoute(
           path: '/create-customer',
           builder: (context, state) => const CreateCustomer(),
           redirect: (context, state) => _requireAuth(),
@@ -494,7 +504,7 @@ final router = GoRouter(
         GoRoute(
           path: '/detail-customer/:customerId',
           builder: (context, state) =>
-              DetailCustomer(id: state.pathParameters['customerId']!),
+              DetailCustomer(customerId: state.pathParameters['customerId']!),
           redirect: (context, state) => _requireAuth(),
         ),
       ],

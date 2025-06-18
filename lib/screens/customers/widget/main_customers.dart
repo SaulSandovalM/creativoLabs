@@ -9,6 +9,7 @@ import 'package:creativolabs/providers/business_model.dart';
 
 class MainCustomers extends StatelessWidget {
   final double headerHeight;
+
   const MainCustomers({super.key, required this.headerHeight});
 
   @override
@@ -25,16 +26,20 @@ class MainCustomers extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: PaginatedTable<Map<String, dynamic>>(
-        stream: customersService.getCustomersStreamByBusiness(businessId).map(
-            (snapshot) => snapshot.docs
-                .map((doc) => doc.data() as Map<String, dynamic>)
-                .toList()),
+        stream: customersService
+            .getCustomersStreamByBusiness(businessId)
+            .map((snapshot) => snapshot.docs.map((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  data['id'] = doc.id;
+                  return data;
+                }).toList()),
         columns: const [
           DataColumn(label: Text('Nombre')),
           DataColumn(label: Text('Telefono')),
           DataColumn(label: Text('Correo')),
           DataColumn(label: Text('Creado en')),
           DataColumn(label: Text('Estatus')),
+          DataColumn(label: Text('Acciones')),
         ],
         buildRow: (data, index) {
           String formatDate(dynamic date) {
@@ -44,7 +49,13 @@ class MainCustomers extends StatelessWidget {
 
           return DataRow(cells: [
             DataCell(
-              Text(data['name'] ?? 'Sin nombre'),
+              Text(
+                '${data['name'] ?? ''} ${data['lastName'] ?? ''} ${data['secondLastName'] ?? ''}'
+                        .trim()
+                        .isNotEmpty
+                    ? '${data['name'] ?? ''} ${data['lastName'] ?? ''} ${data['secondLastName'] ?? ''}'
+                    : 'Sin nombre',
+              ),
               onTap: () => context.go('/detail-customer/${data['id']}'),
             ),
             DataCell(Text(data['phoneNumber']?.toString() ?? 'Sin número')),
@@ -54,24 +65,90 @@ class MainCustomers extends StatelessWidget {
                   ? formatDate(data['createdAt'])
                   : 'Sin fecha'),
             ),
-            DataCell(Row(
-              children: [
-                Icon(
-                  data['status'] == 'Activo'
-                      ? Icons.check_circle
-                      : data['status'] == 'Bloqueado'
-                          ? Icons.hourglass_empty
-                          : Icons.cancel,
-                  color: data['status'] == 'Activo'
-                      ? Colors.green
-                      : data['status'] == 'Bloqueado'
-                          ? Colors.orange
-                          : Colors.red,
-                ),
-                const SizedBox(width: 8),
-                Text(data['status'] ?? 'Sin estado'),
-              ],
-            )),
+            DataCell(
+              Row(
+                children: [
+                  Icon(
+                    data['status'] == 'Activo'
+                        ? Icons.check_circle
+                        : data['status'] == 'Bloqueado'
+                            ? Icons.hourglass_empty
+                            : Icons.cancel,
+                    color: data['status'] == 'Activo'
+                        ? Colors.green
+                        : data['status'] == 'Bloqueado'
+                            ? Colors.orange
+                            : Colors.red,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(data['status'] ?? 'Sin estado'),
+                ],
+              ),
+            ),
+            DataCell(
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert),
+                onSelected: (value) {
+                  if (value == 'edit') {
+                    context.go('/edit-customer/${data['id']}');
+                  } else if (value == 'delete') {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Eliminar cliente'),
+                        content: const Text(
+                            '¿Está seguro de que desea eliminar este cliente?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text('Cancelar'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                              await CustomersService().deleteCustomer(
+                                businessId: businessId,
+                                customerId: data['id'],
+                              );
+                              // ignore: use_build_context_synchronously
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Cliente eliminado'),
+                                ),
+                              );
+                            },
+                            child: const Text('Eliminar',
+                                style: TextStyle(color: Colors.red)),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.edit, size: 18),
+                        SizedBox(width: 8),
+                        Text('Editar'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, size: 18, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Eliminar'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ]);
         },
       ),

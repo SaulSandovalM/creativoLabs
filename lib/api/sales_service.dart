@@ -76,6 +76,7 @@ class SalesService {
     required String address,
     required String cp,
     required String service,
+    required String paymentMethod,
     required double price,
     required String note,
   }) async {
@@ -97,6 +98,7 @@ class SalesService {
         'price': price,
         'note': note,
         'status': 'Pendiente',
+        'paymentMethod': paymentMethod,
       };
       // debugPrint('Guardando venta: $saleData');
       await saleDoc.set(saleData);

@@ -8,14 +8,16 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:creativolabs/providers/business_model.dart';
 
-class MainCreateCustomer extends StatefulWidget {
-  const MainCreateCustomer({super.key});
+class MainEditCustomer extends StatefulWidget {
+  final Map<String, dynamic> customer;
+
+  const MainEditCustomer({super.key, required this.customer});
 
   @override
-  State<MainCreateCustomer> createState() => _MainCreateCustomerState();
+  State<MainEditCustomer> createState() => _MainEditCustomerState();
 }
 
-class _MainCreateCustomerState extends State<MainCreateCustomer> {
+class _MainEditCustomerState extends State<MainEditCustomer> {
   final _formKey = GlobalKey<FormState>();
 
   String? estadoSeleccionado;
@@ -68,6 +70,22 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
   final CustomersService _customersService = CustomersService();
 
   @override
+  void initState() {
+    super.initState();
+    final customer = widget.customer;
+    _nameController.text = customer['name'] ?? '';
+    _lastNameController.text = customer['lastName'] ?? '';
+    _secondLastNameController.text = customer['secondLastName'] ?? '';
+    _emailController.text = customer['email'] ?? '';
+    _phoneController.text = customer['phoneNumber'] ?? '';
+    _companyController.text = customer['company'] ?? '';
+    _cityController.text = customer['ciudad'] ?? '';
+    _addressController.text = customer['direccion'] ?? '';
+    _cpController.text = customer['cp'] ?? '';
+    estadoSeleccionado = customer['estado'];
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
@@ -79,7 +97,7 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
     super.dispose();
   }
 
-  Future<void> saveCustomer() async {
+  Future<void> updateCustomer() async {
     if (_formKey.currentState!.validate()) {
       final businessId =
           Provider.of<BusinessModel>(context, listen: false).businessId;
@@ -89,41 +107,33 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
         );
         return;
       }
-      await _customersService.addCustomerWithAddress(
-        businessId: businessId,
-        customerData: {
-          'businessId': businessId,
-          'name': _nameController.text,
-          'lastName': _lastNameController.text,
-          'secondLastName': _secondLastNameController.text,
-          'email': _emailController.text,
-          'phoneNumber': _phoneController.text,
-          'company': _companyController.text,
-          'status': 'Activo',
-          'estado': estadoSeleccionado,
-          'ciudad': _cityController.text,
-          'direccion': _addressController.text,
-          'cp': _cpController.text,
-        },
-      );
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cliente guardado correctamente')),
-      );
-      _formKey.currentState!.reset();
-      _nameController.clear();
-      _lastNameController.clear();
-      _secondLastNameController.clear();
-      _emailController.clear();
-      _phoneController.clear();
-      _companyController.clear();
-      _cityController.clear();
-      _addressController.clear();
-      _cpController.clear();
-      setState(() {
-        estadoSeleccionado = null;
-      });
-      context.go('/customers');
+      try {
+        await _customersService.updateCustomer(
+          businessId: businessId,
+          customerId: widget.customer['id'],
+          customerData: {
+            'name': _nameController.text,
+            'lastName': _lastNameController.text,
+            'secondLastName': _secondLastNameController.text,
+            'email': _emailController.text,
+            'phoneNumber': _phoneController.text,
+            'company': _companyController.text,
+            'estado': estadoSeleccionado,
+            'ciudad': _cityController.text,
+            'direccion': _addressController.text,
+            'cp': _cpController.text,
+          },
+        );
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Cliente actualizado correctamente')),
+        );
+        context.go('/customers');
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al actualizar: $e')),
+        );
+      }
     }
   }
 
@@ -298,7 +308,7 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
                 children: [
                   Button(
                     title: 'Guardar cliente',
-                    onPressed: () async => await saveCustomer(),
+                    onPressed: () async => await updateCustomer(),
                   ),
                 ],
               ),

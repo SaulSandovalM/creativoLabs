@@ -14,18 +14,36 @@ class CustomersService {
   }
 
   // Obtener un cliente por ID
-  Future<Map<String, dynamic>?> getCustomerById(String id) async {
-    final doc = await customersRef.doc(id).get();
+  Future<Map<String, dynamic>?> getCustomerById({
+    required String businessId,
+    required String customerId,
+  }) async {
+    final doc = await customersRef
+        .doc(businessId)
+        .collection('customers')
+        .doc(customerId)
+        .get();
+
     if (doc.exists) {
-      return doc.data() as Map<String, dynamic>;
+      return {
+        ...doc.data()!,
+        'id': doc.id,
+      };
     } else {
       return null;
     }
   }
 
   /// Elimina un cliente por su ID en Firestore.
-  Future<void> deleteCustomerById(String id) async {
-    await customersRef.doc(id).delete();
+  Future<void> deleteCustomer({
+    required String businessId,
+    required String customerId,
+  }) async {
+    await customersRef
+        .doc(businessId)
+        .collection('customers')
+        .doc(customerId)
+        .delete();
   }
 
   // Crear un nuevo cliente y dirección
@@ -44,12 +62,6 @@ class CustomersService {
         'businessId': businessId,
         'createdAt': FieldValue.serverTimestamp(),
       });
-
-      // 2. Crear dirección como subcolección del nuevo cliente
-      // await nuevoCliente.collection('addresses').add({
-      //   ...addressData,
-      //   'createdAt': FieldValue.serverTimestamp(),
-      // });
     } catch (e) {
       rethrow;
     }
@@ -66,5 +78,15 @@ class CustomersService {
       ...addressData,
       'createdAt': FieldValue.serverTimestamp(),
     });
+  }
+
+  Future<void> updateCustomer({
+    required String businessId,
+    required String customerId,
+    required Map<String, dynamic> customerData,
+  }) async {
+    final docRef =
+        customersRef.doc(businessId).collection('customers').doc(customerId);
+    await docRef.update(customerData);
   }
 }
