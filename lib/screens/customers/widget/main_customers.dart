@@ -34,12 +34,54 @@ class MainCustomers extends StatelessWidget {
                   return data;
                 }).toList()),
         columns: const [
-          DataColumn(label: Text('Nombre')),
-          DataColumn(label: Text('Telefono')),
-          DataColumn(label: Text('Correo')),
-          DataColumn(label: Text('Creado en')),
-          DataColumn(label: Text('Estatus')),
-          DataColumn(label: Text('Acciones')),
+          DataColumn(
+            label: Text(
+              'Nombre',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Telefono',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Correo',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Creado en',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Estatus',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Acciones',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ],
         buildRow: (data, index) {
           String formatDate(dynamic date) {

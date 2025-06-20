@@ -48,11 +48,46 @@ class MainServiceState extends State<MainService> {
                   return data;
                 }).toList()),
         columns: const [
-          DataColumn(label: Text('Servicio')),
-          DataColumn(label: Text('Precio')),
-          DataColumn(label: Text('Descripción')),
-          DataColumn(label: Text('Categoría')),
-          DataColumn(label: Text('')),
+          DataColumn(
+            label: Text(
+              'Servicio',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Precio',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Descripción',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Categoría',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Acciones',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ],
         buildRow: (data, index) {
           return DataRow(
@@ -74,24 +109,65 @@ class MainServiceState extends State<MainService> {
                 ),
               ),
               DataCell(
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        context.go('/edit-service/${data['id']}');
-                      },
-                      child: const Icon(Icons.edit, color: Colors.green),
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert),
+                  onSelected: (value) {
+                    if (value == 'edit') {
+                      context.go('/edit-service/${data['id']}');
+                    } else if (value == 'delete') {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Eliminar servicio'),
+                          content: const Text(
+                              '¿Está seguro de que desea eliminar este servicio?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Text('Cancelar'),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                Navigator.of(context).pop();
+                                await ServiceService().deleteService(
+                                  businessId: businessId,
+                                  serviceId: data['id'],
+                                );
+                                // ignore: use_build_context_synchronously
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Servicio eliminado'),
+                                  ),
+                                );
+                              },
+                              child: const Text('Eliminar',
+                                  style: TextStyle(color: Colors.red)),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit, size: 18),
+                          SizedBox(width: 8),
+                          Text('Editar'),
+                        ],
+                      ),
                     ),
-                    SizedBox(width: 10),
-                    InkWell(
-                      onTap: () async {
-                        await serviceService.deleteService(
-                          businessId: businessId,
-                          serviceId: data['id'],
-                        );
-                      },
-                      child: Icon(Icons.delete, color: Colors.red),
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete, size: 18, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text('Eliminar'),
+                        ],
+                      ),
                     ),
                   ],
                 ),
