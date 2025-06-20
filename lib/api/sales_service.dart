@@ -106,4 +106,59 @@ class SalesService {
       throw Exception('Error al guardar la venta: $e');
     }
   }
+
+  // Obtener un orden por su ID dentro de un negocio específico
+  Future<Map<String, dynamic>?> getOrderById({
+    required String businessId,
+    required String orderId,
+  }) async {
+    final doc =
+        await salesRef.doc(businessId).collection('orders').doc(orderId).get();
+    if (doc.exists) {
+      return {
+        ...doc.data()!,
+        'id': doc.id,
+      };
+    } else {
+      return null;
+    }
+  }
+
+  Future<void> updateSale({
+    required String businessId,
+    required String orderId,
+    required Map<String, dynamic> data,
+  }) async {
+    final docRef = salesRef.doc(businessId).collection('orders').doc(orderId);
+    await docRef.update(data);
+  }
+
+  Future<void> updateStatusSale({
+    required String businessId,
+    required String orderId,
+    required Map<String, dynamic> data,
+  }) async {
+    await salesRef
+        .doc(businessId)
+        .collection('orders')
+        .doc(orderId)
+        .update(data);
+  }
+
+  // Contar el número de órdenes de un negocio específico
+  Future<int> getOrdersCount(String businessId, String type) async {
+    final snapshot = await salesRef
+        .doc(businessId)
+        .collection('orders')
+        .where('status', isEqualTo: type)
+        .get();
+    return snapshot.docs.length;
+  }
+
+  // Contar el número de clientes en un negocio específico
+  Future<int> getCustomersCountByBusiness(String businessId) async {
+    final snapshot =
+        await salesRef.doc(businessId).collection('customers').get();
+    return snapshot.docs.length;
+  }
 }

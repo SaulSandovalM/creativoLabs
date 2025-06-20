@@ -6,6 +6,7 @@ import 'package:creativolabs/providers/business_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 String formatDate(dynamic date) {
   if (date is Timestamp) {
@@ -60,7 +61,7 @@ class _MainSalesState extends State<MainSales> {
               height: MediaQuery.of(context).size.height,
               color: Colors.white,
               child: Material(
-                child: Modal(orderData: data), // 👈 Aquí se pasa la info
+                child: Modal(orderData: data),
               ),
             ),
           );
@@ -138,7 +139,7 @@ class _MainSalesState extends State<MainSales> {
         buildRow: (data, index) {
           return DataRow(
             cells: [
-              DataCell(Text(formatDate(data['createdAt']))),
+              DataCell(Text(data['date'])),
               DataCell(
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,73 +185,79 @@ class _MainSalesState extends State<MainSales> {
                     if (value == 'show') {
                       showOrderSideModal(context, data);
                     } else if (value == 'edit') {
-                      // context.go('/edit-sale/${data['id']}');
-                    } else if (value == 'delete') {
+                      context.go('/edit-order/${data['id']}');
+                    } else if (value == 'updateStatus') {
+                      String selectedStatus = data['status'] ?? 'Pendiente';
                       showDialog(
                         context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Eliminar venta'),
-                          content: const Text(
-                              '¿Está seguro de que desea eliminar esta venta?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: const Text('Cancelar'),
-                            ),
-                            TextButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                                // await SalesService().deleteSale(
-                                //   businessId: businessId,
-                                //   saleId: data['id'],
-                                // );
-                                // ignore: use_build_context_synchronously
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Venta eliminada'),
+                        builder: (context) {
+                          return StatefulBuilder(
+                            builder: (context, setState) => AlertDialog(
+                              title: const Text('Actualizar estatus'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text(
+                                    'Seleccione el nuevo estatus de la orden:',
                                   ),
-                                );
-                              },
-                              child: const Text('Eliminar',
-                                  style: TextStyle(color: Colors.red)),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                    if (value == 'edit') {
-                      // context.go('/edit-service/${data['id']}');
-                    } else if (value == 'delete') {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Eliminar servicio'),
-                          content: const Text(
-                              '¿Está seguro de que desea eliminar este servicio?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: const Text('Cancelar'),
-                            ),
-                            TextButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                                // await ServiceService().deleteService(
-                                //   businessId: businessId,
-                                //   serviceId: data['id'],
-                                // );
-                                // ignore: use_build_context_synchronously
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Servicio eliminado'),
+                                  const SizedBox(height: 16),
+                                  DropdownButtonFormField<String>(
+                                    value: selectedStatus,
+                                    items: [
+                                      'Pendiente',
+                                      'Completado',
+                                      'Cancelado'
+                                    ]
+                                        .map((status) =>
+                                            DropdownMenuItem<String>(
+                                              value: status,
+                                              child: Text(status),
+                                            ))
+                                        .toList(),
+                                    decoration: const InputDecoration(
+                                      labelText: 'Estatus',
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    onChanged: (newValue) {
+                                      if (newValue != null) {
+                                        setState(
+                                            () => selectedStatus = newValue);
+                                      }
+                                    },
                                   ),
-                                );
-                              },
-                              child: const Text('Eliminar',
-                                  style: TextStyle(color: Colors.red)),
+                                ],
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('Cancelar'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    Navigator.of(context).pop();
+                                    await salesService.updateStatusSale(
+                                      businessId: businessId,
+                                      orderId: data['id'],
+                                      data: {'status': selectedStatus},
+                                    );
+                                    // ignore: use_build_context_synchronously
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Estatus de la orden actualizado',
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: const Text(
+                                    'Actualizar estatus',
+                                    style: TextStyle(color: Colors.green),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       );
                     }
                   },
@@ -276,12 +283,12 @@ class _MainSalesState extends State<MainSales> {
                       ),
                     ),
                     const PopupMenuItem(
-                      value: 'delete',
+                      value: 'updateStatus',
                       child: Row(
                         children: [
-                          Icon(Icons.delete, size: 18, color: Colors.red),
+                          Icon(Icons.update, size: 18, color: Colors.red),
                           SizedBox(width: 8),
-                          Text('Eliminar'),
+                          Text('Actualizar estatus'),
                         ],
                       ),
                     ),

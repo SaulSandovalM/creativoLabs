@@ -16,6 +16,8 @@ class Modal extends StatelessWidget {
           const SizedBox(height: 24),
           _buildDetails(),
           const SizedBox(height: 24),
+          _buildNotes(),
+          const SizedBox(height: 24),
           _buildLineItems(),
         ],
       ),
@@ -147,6 +149,25 @@ class Modal extends StatelessWidget {
             ),
           ],
         )
+      ],
+    );
+  }
+
+  Widget _buildNotes() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Notas',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          orderData['note'] ?? 'No hay notas disponibles',
+        ),
       ],
     );
   }

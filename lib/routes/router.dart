@@ -14,6 +14,7 @@ import 'package:creativolabs/screens/politics/view/politics.dart';
 import 'package:creativolabs/screens/profile/view/profile.dart';
 import 'package:creativolabs/screens/resetpassword/view/reset_password.dart';
 import 'package:creativolabs/screens/sales/view/create_sale.dart';
+import 'package:creativolabs/screens/sales/view/edit_sale.dart';
 import 'package:creativolabs/screens/sales/view/sales.dart';
 import 'package:creativolabs/screens/service/view/create_service.dart';
 import 'package:creativolabs/screens/service/view/edit_service.dart';
@@ -314,54 +315,54 @@ final router = GoRouter(
                           context.go('/customers');
                         },
                       ),
-                      ListTile(
-                        leading: const Icon(Icons.trending_up),
-                        title: Text(
-                          'Finanzas',
-                          style: TextStyle(
-                            color: GoRouter.of(context)
-                                        .routerDelegate
-                                        .currentConfiguration
-                                        .fullPath ==
-                                    '/finanzas'
-                                ? Colors.white
-                                : Colors.black,
-                          ),
-                        ),
-                        selected: GoRouter.of(context)
-                                .routerDelegate
-                                .currentConfiguration
-                                .fullPath ==
-                            '/finanzas',
-                        selectedTileColor: Colors.grey.shade200,
-                        onTap: () {
-                          context.go('/finanzas');
-                        },
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.group),
-                        title: Text(
-                          'Empleados',
-                          style: TextStyle(
-                            color: GoRouter.of(context)
-                                        .routerDelegate
-                                        .currentConfiguration
-                                        .fullPath ==
-                                    '/empleados'
-                                ? Colors.white
-                                : Colors.black,
-                          ),
-                        ),
-                        selected: GoRouter.of(context)
-                                .routerDelegate
-                                .currentConfiguration
-                                .fullPath ==
-                            '/empleados',
-                        selectedTileColor: Colors.grey.shade200,
-                        onTap: () {
-                          context.go('/empleados');
-                        },
-                      ),
+                      // ListTile(
+                      //   leading: const Icon(Icons.trending_up),
+                      //   title: Text(
+                      //     'Finanzas',
+                      //     style: TextStyle(
+                      //       color: GoRouter.of(context)
+                      //                   .routerDelegate
+                      //                   .currentConfiguration
+                      //                   .fullPath ==
+                      //               '/finanzas'
+                      //           ? Colors.white
+                      //           : Colors.black,
+                      //     ),
+                      //   ),
+                      //   selected: GoRouter.of(context)
+                      //           .routerDelegate
+                      //           .currentConfiguration
+                      //           .fullPath ==
+                      //       '/finanzas',
+                      //   selectedTileColor: Colors.grey.shade200,
+                      //   onTap: () {
+                      //     context.go('/finanzas');
+                      //   },
+                      // ),
+                      // ListTile(
+                      //   leading: const Icon(Icons.group),
+                      //   title: Text(
+                      //     'Empleados',
+                      //     style: TextStyle(
+                      //       color: GoRouter.of(context)
+                      //                   .routerDelegate
+                      //                   .currentConfiguration
+                      //                   .fullPath ==
+                      //               '/empleados'
+                      //           ? Colors.white
+                      //           : Colors.black,
+                      //     ),
+                      //   ),
+                      //   selected: GoRouter.of(context)
+                      //           .routerDelegate
+                      //           .currentConfiguration
+                      //           .fullPath ==
+                      //       '/empleados',
+                      //   selectedTileColor: Colors.grey.shade200,
+                      //   onTap: () {
+                      //     context.go('/empleados');
+                      //   },
+                      // ),
                       ListTile(
                         leading: const Icon(Icons.settings),
                         title: Text(
@@ -461,6 +462,15 @@ final router = GoRouter(
         GoRoute(
           path: '/create-sales',
           builder: (context, state) => const CreateSales(),
+          redirect: (context, state) => _requireAuth(),
+        ),
+        GoRoute(
+          path: '/edit-order/:orderId',
+          name: 'edit-order',
+          builder: (context, state) {
+            final orderId = state.pathParameters['orderId']!;
+            return EditSale(orderId: orderId);
+          },
           redirect: (context, state) => _requireAuth(),
         ),
         GoRoute(

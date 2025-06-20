@@ -71,7 +71,6 @@ class _MainEditServiceState extends State<MainEditService> {
       _categoriasSeleccionadas = List<String>.from(data['category'] ?? []);
       _showService = data['show'] ?? true;
     }
-
     setState(() => _loading = false);
   }
 

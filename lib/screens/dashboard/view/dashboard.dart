@@ -1,9 +1,56 @@
+import 'package:creativolabs/api/sales_service.dart';
 import 'package:creativolabs/core/widgets/container.dart';
-import 'package:creativolabs/core/widgets/title_cards.dart';
+import 'package:creativolabs/core/widgets/custom_card.dart';
+import 'package:creativolabs/providers/business_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class Dashboard extends StatelessWidget {
+class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
+
+  @override
+  State<Dashboard> createState() => _DashboardState();
+}
+
+class _DashboardState extends State<Dashboard> {
+  int completeOrdersCount = 0;
+  int pendingOrdersCount = 0;
+  int customersCount = 0;
+  String? businessId;
+
+  final SalesService _salesService = SalesService();
+
+  @override
+  void initState() {
+    super.initState();
+    businessId = Provider.of<BusinessModel>(context, listen: false).businessId;
+    _loadCompleteOrdersData();
+    _loadPendingOrdersData();
+    _loadCustomersData();
+  }
+
+  Future<void> _loadCompleteOrdersData() async {
+    final orders =
+        await _salesService.getOrdersCount(businessId!, 'Completado');
+    setState(() {
+      completeOrdersCount = orders;
+    });
+  }
+
+  Future<void> _loadPendingOrdersData() async {
+    final orders = await _salesService.getOrdersCount(businessId!, 'Pendiente');
+    setState(() {
+      pendingOrdersCount = orders;
+    });
+  }
+
+  Future<void> _loadCustomersData() async {
+    final customers =
+        await _salesService.getCustomersCountByBusiness(businessId!);
+    setState(() {
+      customersCount = customers;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,310 +60,180 @@ class Dashboard extends StatelessWidget {
           children: [
             SizedBox(height: 20),
             Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Expanded(
-                  flex: 1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Card(
-                        color: Colors.white,
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TitleCard(
-                                  title: 'Ventas Totales',
-                                ),
-                                const Text(
-                                  '\$ 1,254',
-                                  style: TextStyle(
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const Text(
-                                  '-5%',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Card(
-                        color: Colors.white,
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TitleCard(
-                                  title: 'Pedidos recientes',
-                                ),
-                                const SizedBox(height: 10),
-                                OrdersList(),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Card(
-                        color: Colors.white,
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TitleCard(
-                                  title: 'Ingresos & gastos',
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Card(
-                              color: Colors.white,
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      TitleCard(
-                                        title: 'Metodos de pago',
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Card(
-                              color: Colors.white,
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      TitleCard(
-                                        title: 'Clientes mas frecuentes',
-                                      ),
-                                      TopCustomersList(),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                Text(
+                  'Resumen',
+                  style: TextStyle(
+                    fontSize: 35,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
+            SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomCard(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Icon(
+                              Icons.list,
+                              size: 30,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Ordenes Completadas',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Text(
+                              '$completeOrdersCount',
+                              style: TextStyle(
+                                fontSize: 35,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(width: 20),
+                Expanded(
+                  child: CustomCard(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Icon(
+                              Icons.group_outlined,
+                              size: 30,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Clientes',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Text(
+                              '$customersCount',
+                              style: TextStyle(
+                                fontSize: 35,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(width: 20),
+                Expanded(
+                  child: CustomCard(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Icon(
+                              Icons.warning_amber,
+                              size: 30,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Ordenes Pendientes',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Text(
+                              '$pendingOrdersCount',
+                              style: TextStyle(
+                                fontSize: 35,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            )
           ],
         ),
       ),
-    );
-  }
-}
-
-class OrdersList extends StatelessWidget {
-  final List<Map<String, dynamic>> orders = [
-    {
-      'id': 1001,
-      'customer': 'Marvin Reed',
-      'amount': 642.00,
-      'status': 'Pendiente',
-    },
-    {
-      'id': 1002,
-      'customer': 'Kristin Wilson',
-      'amount': 395.00,
-      'status': 'Completado',
-    },
-    {
-      'id': 1003,
-      'customer': 'Tanye Davidson',
-      'amount': 146.00,
-      'status': 'Completado',
-    },
-    {
-      'id': 1004,
-      'customer': 'Jenny Spencer',
-      'amount': 97.00,
-      'status': 'Completado',
-    },
-  ];
-
-  OrdersList({super.key});
-
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'Completado':
-        return Colors.green.withOpacity(0.2);
-      case 'Pendiente':
-      default:
-        return Colors.grey.shade300;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: orders.map((order) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6.0),
-          child: Row(
-            children: [
-              SizedBox(width: 40, child: Text(order['id'].toString())),
-              Expanded(child: Text(order['customer'])),
-              SizedBox(
-                width: 80,
-                child: Text(
-                  '\$${order['amount'].toStringAsFixed(2)}',
-                  textAlign: TextAlign.right,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _getStatusColor(order['status']),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  order['status'],
-                  style: const TextStyle(fontSize: 12),
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
-class StockList extends StatelessWidget {
-  final List<Map<String, dynamic>> orders = [
-    {
-      'product': 'Producto 1',
-      'amount': 97.00,
-    },
-    {
-      'product': 'Producto 2',
-      'amount': 97.00,
-    },
-    {
-      'product': 'Producto 3',
-      'amount': 97.00,
-    },
-    {
-      'product': 'Producto 4',
-      'amount': 97.00,
-    },
-  ];
-
-  StockList({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: orders.map((order) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6.0),
-          child: Row(
-            children: [
-              Expanded(child: Text(order['product'])),
-              SizedBox(
-                width: 80,
-                child: Text(
-                  '\$${order['amount']}',
-                  textAlign: TextAlign.right,
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
-class TopCustomersList extends StatelessWidget {
-  final List<Map<String, dynamic>> orders = [
-    {
-      'customer': 'Cliente 1',
-      'visits': 23,
-    },
-    {
-      'customer': 'Cliente 2',
-      'visits': 12,
-    },
-    {
-      'customer': 'Cliente 3',
-      'visits': 5,
-    },
-    {
-      'customer': 'Cliente 4',
-      'visits': 1,
-    },
-  ];
-
-  TopCustomersList({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: orders.map((order) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6.0),
-          child: Row(
-            children: [
-              Expanded(child: Text(order['customer'])),
-              SizedBox(
-                width: 80,
-                child: Text(
-                  '${order['visits']}',
-                  textAlign: TextAlign.right,
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
     );
   }
 }
