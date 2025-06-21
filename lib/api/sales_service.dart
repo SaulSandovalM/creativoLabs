@@ -71,6 +71,7 @@ class SalesService {
     required int orderNumber,
     required String date,
     required String time,
+    required DateTime? dateTimeStamp,
     required String state,
     required String city,
     required String address,
@@ -90,6 +91,7 @@ class SalesService {
         'createdAt': FieldValue.serverTimestamp(),
         'date': date,
         'time': time,
+        'dateTimeStamp': dateTimeStamp,
         'state': state,
         'city': city,
         'address': address,
@@ -101,6 +103,52 @@ class SalesService {
         'paymentMethod': paymentMethod,
       };
       // debugPrint('Guardando venta: $saleData');
+      await saleDoc.set(saleData);
+    } catch (e) {
+      throw Exception('Error al guardar la venta: $e');
+    }
+  }
+
+  Future<void> saveSaleCustomer({
+    required String businessId,
+    required String customerName,
+    required String customerLastName,
+    required String customerSecondLastName,
+    required int orderNumber,
+    required String date,
+    required String time,
+    required DateTime? dateTimeStamp,
+    required String state,
+    required String city,
+    required String address,
+    required String cp,
+    required String service,
+    required String paymentMethod,
+    required double price,
+    required String note,
+  }) async {
+    try {
+      final DocumentReference saleDoc =
+          salesRef.doc(businessId).collection('orders').doc();
+      final saleData = {
+        'orderNumber': orderNumber,
+        'customerName': customerName,
+        'customerLastName': customerLastName,
+        'customerSecondLastName': customerSecondLastName,
+        'createdAt': FieldValue.serverTimestamp(),
+        'date': date,
+        'time': time,
+        'dateTimeStamp': dateTimeStamp,
+        'state': state,
+        'city': city,
+        'address': address,
+        'cp': cp,
+        'service': service,
+        'price': price,
+        'note': note,
+        'status': 'Pendiente',
+        'paymentMethod': paymentMethod,
+      };
       await saleDoc.set(saleData);
     } catch (e) {
       throw Exception('Error al guardar la venta: $e');
@@ -160,5 +208,22 @@ class SalesService {
     final snapshot =
         await salesRef.doc(businessId).collection('customers').get();
     return snapshot.docs.length;
+  }
+
+  // Obtener los próximos eventos de un negocio específico
+  Stream<List<Map<String, dynamic>>> getUpcomingEvents(String businessId) {
+    final now = Timestamp.now();
+    return salesRef
+        .doc(businessId)
+        .collection('orders')
+        .where('dateTimeStamp', isGreaterThanOrEqualTo: now)
+        .orderBy('dateTimeStamp')
+        .limit(4)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data();
+              data['id'] = doc.id;
+              return data;
+            }).toList());
   }
 }

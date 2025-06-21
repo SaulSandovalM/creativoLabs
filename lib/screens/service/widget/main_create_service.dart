@@ -34,10 +34,11 @@ class _MainCreateServiceState extends State<MainCreateService> {
     'Albañilería',
     'Cerrajería',
     'Tecnología',
-    'Cuidado de Mascotas',
-    'Cuidado de Niños',
-    'Cuidado de Ancianos',
-    'Cuidado de Personas con Discapacidad',
+    'Mascotas',
+    'Cuidados',
+    // 'Cuidado de Niños',
+    // 'Cuidado de Ancianos',
+    // 'Cuidado de Personas con Discapacidad',
     'Otros',
   ];
   List<String> _categoriasSeleccionadas = [];

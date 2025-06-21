@@ -1,24 +1,30 @@
-import 'package:creativolabs/api/customers_service.dart';
 import 'package:creativolabs/api/sales_service.dart';
 import 'package:creativolabs/api/service_service.dart';
 import 'package:creativolabs/core/widgets/button.dart';
 import 'package:creativolabs/core/widgets/input.dart';
 import 'package:creativolabs/core/widgets/select.dart';
-import 'package:creativolabs/providers/business_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
-class MainCreateSale extends StatefulWidget {
-  const MainCreateSale({super.key});
+class MainCreateOrder extends StatefulWidget {
+  final String serviceId;
+  final String serviceName;
+  final String servicePrice;
+
+  const MainCreateOrder({
+    super.key,
+    required this.serviceId,
+    required this.serviceName,
+    required this.servicePrice,
+  });
 
   @override
-  State<MainCreateSale> createState() => _MainCreateSaleState();
+  State<MainCreateOrder> createState() => _MainCreateOrderState();
 }
 
-class _MainCreateSaleState extends State<MainCreateSale> {
+class _MainCreateOrderState extends State<MainCreateOrder> {
   final _formKey = GlobalKey<FormState>();
 
   List<Map<String, dynamic>> customers = [];
@@ -26,20 +32,56 @@ class _MainCreateSaleState extends State<MainCreateSale> {
 
   String? serviceSelected;
   String? selectedPaymentMethod;
-  String? customerSelected;
-  String? customerId;
-  String? businessId;
+  String? stateSelected;
+
+  List<String> estados = [
+    'Aguascalientes',
+    'Baja California',
+    'Baja California Sur',
+    'Campeche',
+    'Chiapas',
+    'Chihuahua',
+    'Ciudad de México',
+    'Coahuila',
+    'Colima',
+    'Durango',
+    'Estado de México',
+    'Guanajuato',
+    'Guerrero',
+    'Hidalgo',
+    'Jalisco',
+    'Michoacán',
+    'Morelos',
+    'Nayarit',
+    'Nuevo León',
+    'Oaxaca',
+    'Puebla',
+    'Querétaro',
+    'Quintana Roo',
+    'San Luis Potosí',
+    'Sinaloa',
+    'Sonora',
+    'Tabasco',
+    'Tamaulipas',
+    'Tlaxcala',
+    'Veracruz',
+    'Yucatán',
+    'Zacatecas'
+  ];
 
   final _priceController = TextEditingController();
   final TextEditingController _orderNumberController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _secondLastNameController =
+      TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
-  final TextEditingController _stateController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _cpController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
-  final CustomersService _customersService = CustomersService();
+
   final SalesService _salesService = SalesService();
   final ServiceService _serviceService = ServiceService();
 
@@ -48,50 +90,16 @@ class _MainCreateSaleState extends State<MainCreateSale> {
   @override
   void initState() {
     super.initState();
-    final model = Provider.of<BusinessModel>(context, listen: false);
-    businessId = model.businessId;
-    _loadCustomers();
+    serviceSelected = widget.serviceName;
+    _priceController.text = widget.servicePrice;
     _generateOrderNumber();
     _loadServices();
   }
 
-  Future<void> _loadCustomers() async {
-    try {
-      final stream =
-          _customersService.getCustomersStreamByBusiness(businessId!);
-      stream.listen((snapshot) {
-        final List<Map<String, dynamic>> clientesList =
-            snapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          return {
-            'id': doc.id,
-            'name': data['name'] ?? '',
-            'address': data['direccion'] ?? '',
-            'city': data['ciudad'] ?? '',
-            'state': data['estado'] ?? '',
-            'cp': data['cp']?.toString() ?? '',
-          };
-        }).toList();
-        setState(() {
-          customers = clientesList;
-        });
-      }, onError: (error) {
-        setState(() {
-          customers = [];
-          customerSelected = null;
-        });
-      });
-    } catch (e) {
-      setState(() {
-        customers = [];
-        customerSelected = null;
-      });
-    }
-  }
-
   Future<void> _generateOrderNumber() async {
-    if (businessId == null) return;
-    int nextOrderNumber = await _salesService.getLastSalesNumber(businessId!);
+    debugPrint('Generating order number for service: ${widget.serviceId}');
+    int nextOrderNumber =
+        await _salesService.getLastSalesNumber(widget.serviceId);
     setState(() {
       _orderNumberController.text = nextOrderNumber.toString();
     });
@@ -124,13 +132,12 @@ class _MainCreateSaleState extends State<MainCreateSale> {
       locale: const Locale('es', 'ES'),
     );
     if (selectedDate != null) {
-      debugPrint('Fecha seleccionada: $selectedDate');
       _dateController.text = formatDate(selectedDate);
     }
   }
 
   Future<void> _loadServices() async {
-    final stream = _serviceService.getServiceStreamByBusiness(businessId!);
+    final stream = _serviceService.getServiceStreamByBusiness(widget.serviceId);
     stream.listen((snapshot) {
       final List<Map<String, dynamic>> dataService = snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
@@ -153,9 +160,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
 
   Future<void> _submitOrder() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    if (businessId == null ||
-        customerSelected == null ||
-        serviceSelected == null) {
+    if (serviceSelected == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Faltan datos importantes para guardar la orden'),
@@ -171,15 +176,16 @@ class _MainCreateSaleState extends State<MainCreateSale> {
 
       final dateTimeStamp = getSelectedDateTime();
 
-      await _salesService.saveSale(
-        businessId: businessId!,
-        customerId: customerId ?? '',
-        customerName: customerSelected!,
+      await _salesService.saveSaleCustomer(
+        businessId: widget.serviceId,
+        customerName: _nameController.text,
+        customerLastName: _lastNameController.text,
+        customerSecondLastName: _secondLastNameController.text,
         orderNumber: int.parse(_orderNumberController.text),
         date: _dateController.text,
         time: _timeController.text,
         dateTimeStamp: dateTimeStamp,
-        state: _stateController.text,
+        state: stateSelected!,
         city: _cityController.text,
         address: _addressController.text,
         cp: _cpController.text,
@@ -234,38 +240,28 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: Select<String>(
-                      value: customerSelected,
-                      decoration: const InputDecoration(
-                        labelText: 'Cliente',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: customers.map((customer) {
-                        return DropdownMenuItem<String>(
-                          value: customer['name'],
-                          child: Text(customer['name']),
-                        );
-                      }).toList(),
-                      onChanged: (String? nuevoCliente) {
-                        final customer = customers.firstWhere(
-                          (c) => c['name'] == nuevoCliente,
-                          orElse: () => {},
-                        );
-                        setState(() {
-                          customerId = customer['id'];
-                          customerSelected = nuevoCliente;
-                          _stateController.text = customer['state'];
-                          _cityController.text = customer['city'];
-                          _addressController.text = customer['address'];
-                          _cpController.text = customer['cp'];
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor seleccione un cliente';
-                        }
-                        return null;
-                      },
+                    child: Input(
+                      controller: _nameController,
+                      label: 'Nombre',
+                    ),
+                  ),
+                  const SizedBox(width: 25),
+                  Expanded(
+                    child: Input(
+                      controller: _lastNameController,
+                      label: 'Apellido',
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 25),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Input(
+                      controller: _secondLastNameController,
+                      label: 'Segundo Apellido',
                     ),
                   ),
                   const SizedBox(width: 25),
@@ -335,10 +331,29 @@ class _MainCreateSaleState extends State<MainCreateSale> {
               Row(
                 children: [
                   Expanded(
-                    child: Input(
-                      controller: _stateController,
-                      label: 'Estado',
-                      readOnly: true,
+                    child: Select<String>(
+                      value: stateSelected,
+                      items: estados.map((String estado) {
+                        return DropdownMenuItem<String>(
+                          value: estado,
+                          child: Text(estado),
+                        );
+                      }).toList(),
+                      decoration: const InputDecoration(
+                        labelText: 'Estado',
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (String? nuevoEstado) {
+                        setState(() {
+                          stateSelected = nuevoEstado;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor seleccione un estado';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   const SizedBox(width: 25),
@@ -346,7 +361,6 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                     child: Input(
                       controller: _cityController,
                       label: 'Ciudad',
-                      readOnly: true,
                     ),
                   ),
                 ],
@@ -358,7 +372,6 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                     child: Input(
                       controller: _addressController,
                       label: 'Dirección',
-                      readOnly: true,
                     ),
                   ),
                   const SizedBox(width: 25),
@@ -372,7 +385,6 @@ class _MainCreateSaleState extends State<MainCreateSale> {
                         FilteringTextInputFormatter.digitsOnly,
                         LengthLimitingTextInputFormatter(5),
                       ],
-                      readOnly: true,
                     ),
                   ),
                 ],

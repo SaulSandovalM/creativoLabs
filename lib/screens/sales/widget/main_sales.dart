@@ -51,7 +51,7 @@ class _MainSalesState extends State<MainSales> {
       showGeneralDialog(
         context: context,
         barrierDismissible: true,
-        barrierLabel: "Order Details",
+        barrierLabel: "Detalles Orden",
         transitionDuration: Duration(milliseconds: 300),
         pageBuilder: (context, animation, secondaryAnimation) {
           return Align(

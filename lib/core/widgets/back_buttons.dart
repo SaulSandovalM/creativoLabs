@@ -64,6 +64,7 @@ class BackButtons extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
           ),
+          elevation: 0,
         ),
         child: buttonChild,
       ),

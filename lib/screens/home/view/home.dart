@@ -1,4 +1,5 @@
 import 'package:creativolabs/core/widgets/container.dart';
+import 'package:creativolabs/screens/home/widget/first_section.dart';
 import 'package:creativolabs/screens/home/widget/main_desktop.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +12,7 @@ class Home extends StatelessWidget {
       child: Column(
         children: [
           MainDesktop(headerHeight: 60),
-          // FirstSection(),
+          FirstSection(),
           SizedBox(height: 40),
         ],
       ),
