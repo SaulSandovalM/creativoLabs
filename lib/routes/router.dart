@@ -16,6 +16,7 @@ import 'package:creativolabs/screens/resetpassword/view/reset_password.dart';
 import 'package:creativolabs/screens/sales/view/create_sale.dart';
 import 'package:creativolabs/screens/sales/view/edit_sale.dart';
 import 'package:creativolabs/screens/sales/view/sales.dart';
+import 'package:creativolabs/screens/searchresults/view/search_results_view.dart';
 import 'package:creativolabs/screens/service/view/create_service.dart';
 import 'package:creativolabs/screens/service/view/edit_service.dart';
 import 'package:creativolabs/screens/service/view/service.dart';
@@ -40,8 +41,14 @@ final router = GoRouter(
       '/services',
       '/terms',
       '/politics',
+      RegExp(r'^/search/.*$'),
     ];
-    if (user == null && !publicRoutes.any((path) => state.uri.path == path)) {
+    final isPublic = publicRoutes.any((route) {
+      if (route is String) return state.uri.path == route;
+      if (route is RegExp) return route.hasMatch(state.uri.path);
+      return false;
+    });
+    if (user == null && !isPublic) {
       return '/home';
     }
     return null;
@@ -443,6 +450,13 @@ final router = GoRouter(
         GoRoute(
           path: '/politics',
           builder: (context, state) => const Politics(),
+        ),
+        GoRoute(
+          path: '/search/:query',
+          builder: (context, state) {
+            final query = state.pathParameters['query']!;
+            return SearchResultsView(query: query);
+          },
         ),
         GoRoute(
           path: '/profile',

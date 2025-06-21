@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 class ServiceService {
   final CollectionReference servicesRef =
@@ -71,5 +72,25 @@ class ServiceService {
     } catch (e) {
       rethrow;
     }
+  }
+
+  // Buscar todos los servicios por categoría
+  Stream<List<Map<String, dynamic>>> searchAllServicesByCategory(
+      String category) {
+    return FirebaseFirestore.instance
+        .collectionGroup('services')
+        .where('category', arrayContains: category)
+        .snapshots()
+        .map((snapshot) {
+      debugPrint('Snapshot data: ${snapshot.docs.length} documents found.');
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).toList();
+    }).handleError((error, stackTrace) {
+      debugPrint('Error en searchAllServicesByCategory: $error');
+      debugPrint('StackTrace: $stackTrace');
+    });
   }
 }
