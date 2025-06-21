@@ -1,4 +1,6 @@
+import 'package:creativolabs/core/widgets/button.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ModalSearch extends StatelessWidget {
   final Map<String, dynamic> serviceData;
@@ -7,6 +9,7 @@ class ModalSearch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('ModalSearch: $serviceData');
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -108,23 +111,23 @@ class ModalSearch extends StatelessWidget {
                   ],
                 ),
               ),
-              // Text(
-              //   'Nombre: ${serviceData['name'] ?? 'No disponible'}',
-              //   style: TextStyle(fontSize: 18),
-              // ),
-              // const SizedBox(height: 8),
-              // Text(
-              //   'Descripción: ${serviceData['description'] ?? 'No disponible'}',
-              //   style: TextStyle(fontSize: 18),
-              // ),
-              // const SizedBox(height: 8),
-              // Text(
-              //   'Precio: \$${serviceData['price']?.toStringAsFixed(2) ?? '0.00'}',
-              //   style: TextStyle(fontSize: 18),
-              // ),
             ],
           ),
           const SizedBox(height: 24),
+          Button(
+            title: 'Solicitar Servicio',
+            onPressed: () {
+              context.pop();
+              context.go(
+                '/create-order',
+                extra: {
+                  'id': serviceData['businessId'],
+                  'name': serviceData['name'],
+                  'price': serviceData['price'],
+                },
+              );
+            },
+          ),
           const SizedBox(height: 24),
         ],
       ),

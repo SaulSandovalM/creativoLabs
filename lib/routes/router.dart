@@ -4,6 +4,7 @@ import 'package:creativolabs/core/widgets/site_logo.dart';
 import 'package:creativolabs/screens/about/view/about.dart';
 import 'package:creativolabs/screens/authwrapper/view/authwrapper.dart';
 import 'package:creativolabs/screens/contact/view/contact.dart';
+import 'package:creativolabs/screens/createorder/view/createorder.dart';
 import 'package:creativolabs/screens/customers/view/create_customer.dart';
 import 'package:creativolabs/screens/customers/view/customers.dart';
 import 'package:creativolabs/screens/customers/view/detail_customer.dart';
@@ -41,6 +42,7 @@ final router = GoRouter(
       '/services',
       '/terms',
       '/politics',
+      '/create-order',
       RegExp(r'^/search/.*$'),
     ];
     final isPublic = publicRoutes.any((route) {
@@ -456,6 +458,21 @@ final router = GoRouter(
           builder: (context, state) {
             final query = state.pathParameters['query']!;
             return SearchResultsView(query: query);
+          },
+        ),
+        GoRoute(
+          path: '/create-order',
+          builder: (context, state) {
+            final data = state.extra as Map<String, dynamic>;
+            final serviceId = data['id'];
+            final serviceName = data['name'];
+            final servicePrice = data['price'];
+
+            return Createorder(
+              serviceId: serviceId,
+              serviceName: serviceName,
+              servicePrice: servicePrice,
+            );
           },
         ),
         GoRoute(

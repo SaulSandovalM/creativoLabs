@@ -109,6 +109,52 @@ class SalesService {
     }
   }
 
+  Future<void> saveSaleCustomer({
+    required String businessId,
+    required String customerName,
+    required String customerLastName,
+    required String customerSecondLastName,
+    required int orderNumber,
+    required String date,
+    required String time,
+    required DateTime? dateTimeStamp,
+    required String state,
+    required String city,
+    required String address,
+    required String cp,
+    required String service,
+    required String paymentMethod,
+    required double price,
+    required String note,
+  }) async {
+    try {
+      final DocumentReference saleDoc =
+          salesRef.doc(businessId).collection('orders').doc();
+      final saleData = {
+        'orderNumber': orderNumber,
+        'customerName': customerName,
+        'customerLastName': customerLastName,
+        'customerSecondLastName': customerSecondLastName,
+        'createdAt': FieldValue.serverTimestamp(),
+        'date': date,
+        'time': time,
+        'dateTimeStamp': dateTimeStamp,
+        'state': state,
+        'city': city,
+        'address': address,
+        'cp': cp,
+        'service': service,
+        'price': price,
+        'note': note,
+        'status': 'Pendiente',
+        'paymentMethod': paymentMethod,
+      };
+      await saleDoc.set(saleData);
+    } catch (e) {
+      throw Exception('Error al guardar la venta: $e');
+    }
+  }
+
   // Obtener un orden por su ID dentro de un negocio específico
   Future<Map<String, dynamic>?> getOrderById({
     required String businessId,
