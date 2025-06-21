@@ -101,6 +101,20 @@ class _MainCreateSaleState extends State<MainCreateSale> {
     return DateFormat('dd MMMM yyyy', 'es').format(date);
   }
 
+  DateTime? getSelectedDateTime() {
+    if (_dateController.text.isEmpty || _timeController.text.isEmpty) {
+      return null;
+    }
+    try {
+      final date = DateFormat('dd MMMM yyyy', 'es').parse(_dateController.text);
+      final time =
+          TimeOfDay.fromDateTime(DateFormat.Hm().parse(_timeController.text));
+      return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? selectedDate = await showDatePicker(
       context: context,
@@ -110,6 +124,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
       locale: const Locale('es', 'ES'),
     );
     if (selectedDate != null) {
+      debugPrint('Fecha seleccionada: $selectedDate');
       _dateController.text = formatDate(selectedDate);
     }
   }
@@ -153,6 +168,9 @@ class _MainCreateSaleState extends State<MainCreateSale> {
             _priceController.text.replaceAll(RegExp(r'[^\d.]'), ''),
           ) ??
           0.0;
+
+      final dateTimeStamp = getSelectedDateTime();
+
       await _salesService.saveSale(
         businessId: businessId!,
         customerId: customerId ?? '',
@@ -160,6 +178,7 @@ class _MainCreateSaleState extends State<MainCreateSale> {
         orderNumber: int.parse(_orderNumberController.text),
         date: _dateController.text,
         time: _timeController.text,
+        dateTimeStamp: dateTimeStamp,
         state: _stateController.text,
         city: _cityController.text,
         address: _addressController.text,

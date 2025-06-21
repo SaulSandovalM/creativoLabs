@@ -71,6 +71,7 @@ class SalesService {
     required int orderNumber,
     required String date,
     required String time,
+    required DateTime? dateTimeStamp,
     required String state,
     required String city,
     required String address,
@@ -90,6 +91,7 @@ class SalesService {
         'createdAt': FieldValue.serverTimestamp(),
         'date': date,
         'time': time,
+        'dateTimeStamp': dateTimeStamp,
         'state': state,
         'city': city,
         'address': address,
@@ -160,5 +162,22 @@ class SalesService {
     final snapshot =
         await salesRef.doc(businessId).collection('customers').get();
     return snapshot.docs.length;
+  }
+
+  // Obtener los próximos eventos de un negocio específico
+  Stream<List<Map<String, dynamic>>> getUpcomingEvents(String businessId) {
+    final now = Timestamp.now();
+    return salesRef
+        .doc(businessId)
+        .collection('orders')
+        .where('dateTimeStamp', isGreaterThanOrEqualTo: now)
+        .orderBy('dateTimeStamp')
+        .limit(4)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data();
+              data['id'] = doc.id;
+              return data;
+            }).toList());
   }
 }

@@ -1,69 +1,82 @@
+import 'package:creativolabs/api/sales_service.dart';
+import 'package:creativolabs/core/widgets/dashboard_card.dart';
+import 'package:creativolabs/providers/business_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class MainDashboard extends StatefulWidget {
-  final double headerHeight;
-
-  const MainDashboard({super.key, required this.headerHeight});
+  const MainDashboard({super.key});
 
   @override
-  MainDashboardState createState() => MainDashboardState();
+  State<MainDashboard> createState() => _MainDashboardState();
 }
 
-class MainDashboardState extends State<MainDashboard> {
+class _MainDashboardState extends State<MainDashboard> {
+  final SalesService _salesService = SalesService();
+
+  int completeOrdersCount = 0;
+  int pendingOrdersCount = 0;
+  int customersCount = 0;
+
+  String? businessId;
+
+  @override
+  void initState() {
+    super.initState();
+    businessId = Provider.of<BusinessModel>(context, listen: false).businessId;
+    _loadCompleteOrdersData();
+    _loadPendingOrdersData();
+    _loadCustomersData();
+  }
+
+  Future<void> _loadCompleteOrdersData() async {
+    final orders =
+        await _salesService.getOrdersCount(businessId!, 'Completado');
+    setState(() {
+      completeOrdersCount = orders;
+    });
+  }
+
+  Future<void> _loadPendingOrdersData() async {
+    final orders = await _salesService.getOrdersCount(businessId!, 'Pendiente');
+    setState(() {
+      pendingOrdersCount = orders;
+    });
+  }
+
+  Future<void> _loadCustomersData() async {
+    final customers =
+        await _salesService.getCustomersCountByBusiness(businessId!);
+    setState(() {
+      customersCount = customers;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        double width = constraints.maxWidth;
-        int crossAxisCount = 3;
-
-        if (width < 900) crossAxisCount = 2;
-        if (width < 600) crossAxisCount = 1;
-
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 3 / 2,
-          ),
-          itemCount: 3,
-          itemBuilder: (context, index) => _buildCard(),
-        );
-      },
+    return Row(
+      children: [
+        DashboardCard(
+          icon: Icons.list,
+          title: 'Órdenes Completadas',
+          value: completeOrdersCount,
+          previousValue: 1,
+        ),
+        const SizedBox(width: 20),
+        DashboardCard(
+          icon: Icons.group_outlined,
+          title: 'Clientes',
+          value: customersCount,
+          previousValue: 15,
+        ),
+        const SizedBox(width: 20),
+        DashboardCard(
+          icon: Icons.warning_amber,
+          title: 'Órdenes Pendientes',
+          value: pendingOrdersCount,
+          previousValue: 15,
+        ),
+      ],
     );
   }
-}
-
-Widget _buildCard() {
-  return SizedBox(
-    child: Card(
-      elevation: 5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.devices, size: 50, color: Colors.blue),
-            const SizedBox(height: 10),
-            const Text(
-              'Card Responsiva',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              'Esta tarjeta se ajusta automáticamente a la pantalla.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
 }
