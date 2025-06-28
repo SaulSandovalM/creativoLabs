@@ -1,6 +1,7 @@
 import 'package:creativolabs/core/constants/colors.dart';
 import 'package:creativolabs/core/widgets/footer.dart';
 import 'package:creativolabs/core/widgets/site_logo.dart';
+import 'package:creativolabs/onboarding.dart';
 import 'package:creativolabs/screens/about/view/about.dart';
 import 'package:creativolabs/screens/authwrapper/view/authwrapper.dart';
 import 'package:creativolabs/screens/contact/view/contact.dart';
@@ -28,11 +29,21 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final router = GoRouter(
   initialLocation: '/',
-  redirect: (context, state) {
+  redirect: (context, state) async {
+    final prefs = await SharedPreferences.getInstance();
     final user = FirebaseAuth.instance.currentUser;
+
+    // Si ya vio el onboarding, continúa
+    final seenOnboarding = prefs.getBool('onboarding_seen') ?? false;
+    if (!seenOnboarding && state.uri.path != '/onboarding') {
+      return '/onboarding';
+    }
+
+    // final user = FirebaseAuth.instance.currentUser;
     final publicRoutes = [
       '/signin',
       '/signup',
@@ -43,6 +54,7 @@ final router = GoRouter(
       '/terms',
       '/politics',
       '/create-order',
+      '/onboarding',
       RegExp(r'^/search/.*$'),
     ];
     final isPublic = publicRoutes.any((route) {
@@ -56,6 +68,10 @@ final router = GoRouter(
     return null;
   },
   routes: [
+    GoRoute(
+      path: '/onboarding',
+      builder: (context, state) => const Onboarding(),
+    ),
     ShellRoute(
       builder: (context, state, child) {
         final user = FirebaseAuth.instance.currentUser;
