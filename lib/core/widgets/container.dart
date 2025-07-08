@@ -12,9 +12,15 @@ class MainContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(40, 0, 40, 0),
-      child: child,
+    return SingleChildScrollView(
+      child: SafeArea(
+        child: Container(
+          width: double.infinity,
+          constraints: const BoxConstraints(minHeight: 600),
+          margin: const EdgeInsets.symmetric(horizontal: 40),
+          child: child,
+        ),
+      ),
     );
   }
 }

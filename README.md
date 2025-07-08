@@ -40,6 +40,7 @@ See full list in [`pubspec.yaml`](./pubspec.yaml)
 ## Setup & Installation
 
 1. **Clone the repo**
+
 ```bash
 git clone https://github.com/SaulSandovalM/creativoLabs.git
 cd creativolabs
@@ -130,3 +131,4 @@ Cyberpunk developer. Building the future with code and caffeine.
 ---
 
 > **Deploy Destroy Repeat**
+
