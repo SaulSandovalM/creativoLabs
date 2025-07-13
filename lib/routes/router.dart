@@ -1,6 +1,7 @@
 import 'package:creativolabs/core/constants/colors.dart';
+import 'package:creativolabs/core/widgets/button.dart';
 import 'package:creativolabs/core/widgets/footer.dart';
-import 'package:creativolabs/core/widgets/site_logo.dart';
+import 'package:creativolabs/core/widgets/header_title.dart';
 import 'package:creativolabs/onboarding.dart';
 import 'package:creativolabs/screens/about/view/about.dart';
 import 'package:creativolabs/screens/authwrapper/view/authwrapper.dart';
@@ -12,6 +13,7 @@ import 'package:creativolabs/screens/customers/view/detail_customer.dart';
 import 'package:creativolabs/screens/customers/view/edit_customer.dart';
 import 'package:creativolabs/screens/dashboard/view/dashboard.dart';
 import 'package:creativolabs/screens/home/view/home.dart';
+import 'package:creativolabs/screens/places/view/places.dart';
 import 'package:creativolabs/screens/politics/view/politics.dart';
 import 'package:creativolabs/screens/profile/view/profile.dart';
 import 'package:creativolabs/screens/resetpassword/view/reset_password.dart';
@@ -55,6 +57,7 @@ final router = GoRouter(
       '/politics',
       '/create-order',
       '/onboarding',
+      '/places',
       RegExp(r'^/search/.*$'),
     ];
     final isPublic = publicRoutes.any((route) {
@@ -96,104 +99,124 @@ final router = GoRouter(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SiteLogo(
-                    onTap: () {
-                      context.go('/');
-                    },
-                  ),
+                  HeaderTitle(
+                      title: 'CreativoLabs',
+                      onTap: () {
+                        context.go('/');
+                      }),
                   Row(
                     children: [
-                      if (user != null)
-                        Text(
-                          DateFormat("dd 'de' MMMM yyyy", 'es')
-                              .format(DateTime.now()),
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                          ),
-                        ),
-                      if (user != null)
-                        IconButton(
-                          icon: const Icon(Icons.notifications),
-                          onPressed: () {
-                            showMenu(
-                              context: context,
-                              position:
-                                  const RelativeRect.fromLTRB(100, 60, 0, 0),
-                              items: [
-                                PopupMenuItem(
-                                  child: ListTile(
-                                    leading: const Icon(
-                                        Icons.notification_important),
-                                    title: const Text('Notificación 1'),
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                    },
+                      user != null
+                          ? Row(
+                              children: [
+                                Text(
+                                  DateFormat("dd 'de' MMMM yyyy", 'es')
+                                      .format(DateTime.now()),
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
                                   ),
                                 ),
-                                PopupMenuItem(
-                                  child: ListTile(
-                                    leading: const Icon(
-                                        Icons.notification_important),
-                                    title: const Text('Notificación 2'),
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
+                                IconButton(
+                                  icon: const Icon(Icons.notifications),
+                                  onPressed: () {
+                                    showMenu(
+                                      context: context,
+                                      position: const RelativeRect.fromLTRB(
+                                          100, 60, 0, 0),
+                                      items: [
+                                        PopupMenuItem(
+                                          child: ListTile(
+                                            leading: const Icon(
+                                                Icons.notification_important),
+                                            title: const Text('Notificación 1'),
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                        ),
+                                        PopupMenuItem(
+                                          child: ListTile(
+                                            leading: const Icon(
+                                                Icons.notification_important),
+                                            title: const Text('Notificación 2'),
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                        ),
+                                        PopupMenuItem(
+                                          child: ListTile(
+                                            leading: const Icon(
+                                                Icons.notification_important),
+                                            title: const Text('Notificación 3'),
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
                                 ),
-                                PopupMenuItem(
-                                  child: ListTile(
-                                    leading: const Icon(
-                                        Icons.notification_important),
-                                    title: const Text('Notificación 3'),
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
+                                PopupMenuButton<String>(
+                                  icon: const Icon(Icons.person),
+                                  offset: const Offset(0, 50),
+                                  onSelected: (String result) async {
+                                    final ctx = context;
+                                    if (result == 'signin') {
+                                      ctx.go('/signin');
+                                    } else if (result == 'signup') {
+                                      ctx.go('/signup');
+                                    } else if (result == 'profile') {
+                                      ctx.go('/profile');
+                                    } else if (result == 'signout') {
+                                      await FirebaseAuth.instance.signOut();
+                                      if (!ctx.mounted) return;
+                                      ctx.go('/signin');
+                                    }
+                                  },
+                                  itemBuilder: (BuildContext context) {
+                                    return <PopupMenuEntry<String>>[
+                                      const PopupMenuItem<String>(
+                                        value: 'profile',
+                                        child: Text('Perfil'),
+                                      ),
+                                      const PopupMenuItem<String>(
+                                        value: 'signout',
+                                        child: Text('Cerrar sesión'),
+                                      ),
+                                    ];
+                                  },
                                 ),
                               ],
-                            );
-                          },
-                        ),
-                      PopupMenuButton<String>(
-                        icon: const Icon(Icons.person),
-                        offset: const Offset(0, 50),
-                        onSelected: (String result) async {
-                          final ctx = context;
-                          if (result == 'signin') {
-                            ctx.go('/signin');
-                          } else if (result == 'signup') {
-                            ctx.go('/signup');
-                          } else if (result == 'profile') {
-                            ctx.go('/profile');
-                          } else if (result == 'signout') {
-                            await FirebaseAuth.instance.signOut();
-                            if (!ctx.mounted) return;
-                            ctx.go('/signin');
-                          }
-                        },
-                        itemBuilder: (BuildContext context) {
-                          if (user != null) {
-                            return <PopupMenuEntry<String>>[
-                              const PopupMenuItem<String>(
-                                value: 'profile',
-                                child: Text('Perfil'),
-                              ),
-                              const PopupMenuItem<String>(
-                                value: 'signout',
-                                child: Text('Cerrar sesión'),
-                              ),
-                            ];
-                          } else {
-                            return <PopupMenuEntry<String>>[
-                              const PopupMenuItem<String>(
-                                value: 'signin',
-                                child: Text('Iniciar sesión'),
-                              ),
-                            ];
-                          }
-                        },
-                      ),
+                            )
+                          : Row(
+                              children: [
+                                HeaderTitle(
+                                  title: 'Lugares',
+                                  onTap: () {
+                                    context.go('/places');
+                                  },
+                                ),
+                                HeaderTitle(
+                                  title: 'Servicios',
+                                  onTap: () {
+                                    context.go('/');
+                                  },
+                                ),
+                                HeaderTitle(
+                                  title: 'Oficios',
+                                  onTap: () {
+                                    context.go('/');
+                                  },
+                                ),
+                                Button(
+                                  title: 'Iniciar sesión',
+                                  onPressed: () => context.go('/signin'),
+                                ),
+                              ],
+                            ),
                     ],
                   ),
                 ],
@@ -340,54 +363,6 @@ final router = GoRouter(
                           context.go('/customers');
                         },
                       ),
-                      // ListTile(
-                      //   leading: const Icon(Icons.trending_up),
-                      //   title: Text(
-                      //     'Finanzas',
-                      //     style: TextStyle(
-                      //       color: GoRouter.of(context)
-                      //                   .routerDelegate
-                      //                   .currentConfiguration
-                      //                   .fullPath ==
-                      //               '/finanzas'
-                      //           ? Colors.white
-                      //           : Colors.black,
-                      //     ),
-                      //   ),
-                      //   selected: GoRouter.of(context)
-                      //           .routerDelegate
-                      //           .currentConfiguration
-                      //           .fullPath ==
-                      //       '/finanzas',
-                      //   selectedTileColor: Colors.grey.shade200,
-                      //   onTap: () {
-                      //     context.go('/finanzas');
-                      //   },
-                      // ),
-                      // ListTile(
-                      //   leading: const Icon(Icons.group),
-                      //   title: Text(
-                      //     'Empleados',
-                      //     style: TextStyle(
-                      //       color: GoRouter.of(context)
-                      //                   .routerDelegate
-                      //                   .currentConfiguration
-                      //                   .fullPath ==
-                      //               '/empleados'
-                      //           ? Colors.white
-                      //           : Colors.black,
-                      //     ),
-                      //   ),
-                      //   selected: GoRouter.of(context)
-                      //           .routerDelegate
-                      //           .currentConfiguration
-                      //           .fullPath ==
-                      //       '/empleados',
-                      //   selectedTileColor: Colors.grey.shade200,
-                      //   onTap: () {
-                      //     context.go('/empleados');
-                      //   },
-                      // ),
                       ListTile(
                         leading: const Icon(Icons.settings),
                         title: Text(
@@ -448,6 +423,10 @@ final router = GoRouter(
         GoRoute(
           path: '/signup',
           builder: (context, state) => const SignUp(),
+        ),
+        GoRoute(
+          path: '/places',
+          builder: (context, state) => const Places(),
         ),
         GoRoute(
           path: '/reset-password',

@@ -1,3 +1,4 @@
+// import 'package:creativolabs/core/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/colors.dart';
@@ -58,32 +59,13 @@ class MainDesktopState extends State<MainDesktop> {
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double availableHeight = screenHeight - widget.headerHeight;
-
     return SizedBox(
-      height: availableHeight,
       child: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                'TU DIRECTORIO DE SERVICIOS Y NEGOCIOS',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const Text(
-                '¿Qué servicio necesitas hoy?',
-                style: TextStyle(
-                  fontSize: 60,
-                  color: Colors.black,
-                ),
-              ),
               Container(
                 margin: const EdgeInsets.symmetric(vertical: 20),
                 width: 600,
@@ -105,13 +87,9 @@ class MainDesktopState extends State<MainDesktop> {
                   ),
                 ),
               ),
-              const Text(
-                'Descubre expertos, impulsa tu ciudad',
-                style: TextStyle(color: Colors.black),
-              ),
-              const SizedBox(height: 40),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 800),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
                 child: Row(
                   children: [
                     IconButton(
@@ -163,6 +141,52 @@ class MainDesktopState extends State<MainDesktop> {
                   ],
                 ),
               ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Text(
+                          'Conecta con los mejores servicios locales',
+                          style: TextStyle(
+                            fontSize: 60,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'Encuentra negocios y profesionales de confianza o promociona tu negocio en un solo clic.',
+                          style: TextStyle(fontSize: 30, color: Colors.black54),
+                        ),
+                        ElevatedButton(
+                          onPressed: () => debugPrint('lol'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 40,
+                              vertical: 20,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                          ),
+                          child: Text(
+                            'Unete ahora',
+                            style: TextStyle(fontSize: 25),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Image.asset(
+                      'assets/images/dogp.png',
+                      height: 550,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
         ),

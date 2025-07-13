@@ -93,4 +93,27 @@ class ServiceService {
       debugPrint('StackTrace: $stackTrace');
     });
   }
+
+  Stream<List<Map<String, dynamic>>> searchAllServices() {
+    return FirebaseFirestore.instance
+        .collectionGroup('services')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).toList();
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> getLast4GlobalServices() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collectionGroup('services')
+        .orderBy('createdAt', descending: true)
+        .limit(4)
+        .get();
+
+    return snapshot.docs.map((doc) => doc.data()).toList();
+  }
 }
