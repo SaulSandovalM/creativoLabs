@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 class ServiceService {
   final CollectionReference servicesRef =
@@ -94,19 +95,6 @@ class ServiceService {
     });
   }
 
-  Stream<List<Map<String, dynamic>>> searchAllServices() {
-    return FirebaseFirestore.instance
-        .collectionGroup('services')
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        data['id'] = doc.id;
-        return data;
-      }).toList();
-    });
-  }
-
   Future<List<Map<String, dynamic>>> getLast4GlobalServices() async {
     final snapshot = await FirebaseFirestore.instance
         .collectionGroup('services')
@@ -115,5 +103,33 @@ class ServiceService {
         .get();
 
     return snapshot.docs.map((doc) => doc.data()).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getNearbyServices(Position userPos,
+      {double radiusKm = 10}) async {
+    final snapshot =
+        await FirebaseFirestore.instance.collectionGroup('services').get();
+
+    final nearby = snapshot.docs
+        .where((doc) {
+          final data = doc.data();
+          final lat = data['lat'];
+          final lng = data['lng'];
+
+          if (lat == null || lng == null) return false;
+
+          final distance = Geolocator.distanceBetween(
+            userPos.latitude,
+            userPos.longitude,
+            lat,
+            lng,
+          );
+
+          return distance <= radiusKm * 1000; // Convertimos a metros
+        })
+        .map((doc) => doc.data())
+        .toList();
+
+    return nearby;
   }
 }

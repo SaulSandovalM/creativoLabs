@@ -154,11 +154,31 @@ class InfluencerCard extends StatelessWidget {
           children: [
             Stack(
               children: [
-                Image.network(
-                  info['imagen'],
+                Container(
                   height: 200,
                   width: double.infinity,
-                  fit: BoxFit.cover,
+                  decoration: BoxDecoration(
+                    image: info['imagen'] != null &&
+                            info['imagen'].toString().isNotEmpty
+                        ? DecorationImage(
+                            image: NetworkImage(info['imagen']),
+                            fit: BoxFit.cover,
+                            onError: (error, stackTrace) =>
+                                debugPrint('❌ Error cargando imagen: $error'),
+                          )
+                        : null,
+                    color: info['imagen'] == null ||
+                            info['imagen'].toString().isEmpty
+                        ? Colors.grey.shade300
+                        : null,
+                  ),
+                  child: info['imagen'] == null ||
+                          info['imagen'].toString().isEmpty
+                      ? const Center(
+                          child: Icon(Icons.image_not_supported,
+                              size: 48, color: Colors.grey),
+                        )
+                      : null,
                 ),
                 Positioned(
                   top: 8,
@@ -256,17 +276,3 @@ class InfluencerCard extends StatelessWidget {
     );
   }
 }
-
-// Datos de prueba
-final List<Map<String, dynamic>> influencerData = List.generate(
-    4,
-    (_) => {
-          'nombre': 'Brenda Cifuentes',
-          'descripcion': 'Crítica cultural y bloguera que radica en Puebla.',
-          'categoria': 'COMIDA',
-          'usuario': '@sitioincreible',
-          'imagen':
-              'https://images.unsplash.com/photo-1600891964599-f61ba0e24092',
-          'avatar': Icons.person,
-          'social': ['instagram', 'facebook', 'twitter', 'linkedin']
-        });
