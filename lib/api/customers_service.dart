@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class CustomersService {
   final CollectionReference customersRef =
       FirebaseFirestore.instance.collection('business');
+  final CollectionReference userRef =
+      FirebaseFirestore.instance.collection('users');
 
   // Obtener clientes de un negocio específico
   Stream<QuerySnapshot> getCustomersStreamByBusiness(String businessId) {
@@ -88,5 +90,20 @@ class CustomersService {
     final docRef =
         customersRef.doc(businessId).collection('customers').doc(customerId);
     await docRef.update(customerData);
+  }
+
+  Future<void> createCustomerForUser({
+    required String userId,
+    required String name,
+    required String lastName,
+    required String email,
+  }) async {
+    await userRef.doc(userId).set({
+      'name': name,
+      'lastName': lastName,
+      'email': email,
+      'role': 'customer',
+      'createdAt': FieldValue.serverTimestamp(),
+    });
   }
 }

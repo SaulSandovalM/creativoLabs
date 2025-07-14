@@ -24,8 +24,10 @@ import 'package:creativolabs/screens/searchresults/view/search_results_view.dart
 import 'package:creativolabs/screens/service/view/create_service.dart';
 import 'package:creativolabs/screens/service/view/edit_service.dart';
 import 'package:creativolabs/screens/service/view/service.dart';
+import 'package:creativolabs/screens/servicescategories/view/services_categories.dart';
 import 'package:creativolabs/screens/signin/view/signin.dart';
 import 'package:creativolabs/screens/signup/view/signup.dart';
+import 'package:creativolabs/screens/signupbussines/view/signup_business.dart';
 import 'package:creativolabs/screens/terms/view/terms.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -45,10 +47,10 @@ final router = GoRouter(
       return '/onboarding';
     }
 
-    // final user = FirebaseAuth.instance.currentUser;
     final publicRoutes = [
       '/signin',
       '/signup',
+      '/signup_business',
       '/home',
       '/about',
       '/contact',
@@ -58,6 +60,7 @@ final router = GoRouter(
       '/create-order',
       '/onboarding',
       '/places',
+      '/service_categories',
       RegExp(r'^/search/.*$'),
     ];
     final isPublic = publicRoutes.any((route) {
@@ -202,7 +205,7 @@ final router = GoRouter(
                                 HeaderTitle(
                                   title: 'Servicios',
                                   onTap: () {
-                                    context.go('/');
+                                    context.go('/service_categories');
                                   },
                                 ),
                                 HeaderTitle(
@@ -425,8 +428,16 @@ final router = GoRouter(
           builder: (context, state) => const SignUp(),
         ),
         GoRoute(
+          path: '/signup_business',
+          builder: (context, state) => const SignupBusiness(),
+        ),
+        GoRoute(
           path: '/places',
           builder: (context, state) => const Places(),
+        ),
+        GoRoute(
+          path: '/service_categories',
+          builder: (context, state) => const ServicesCategories(),
         ),
         GoRoute(
           path: '/reset-password',

@@ -1,30 +1,30 @@
-import 'package:creativolabs/api/customers_service.dart';
 import 'package:creativolabs/core/constants/colors.dart';
 import 'package:creativolabs/core/widgets/button.dart';
 import 'package:creativolabs/core/widgets/container.dart';
+import 'package:creativolabs/api/business_service.dart';
 import 'package:creativolabs/core/widgets/input.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class MainSignup extends StatefulWidget {
+class MainSignupBusiness extends StatefulWidget {
   final double headerHeight;
 
-  const MainSignup({super.key, required this.headerHeight});
+  const MainSignupBusiness({super.key, required this.headerHeight});
 
   @override
-  MainSignupState createState() => MainSignupState();
+  MainSignupBusinessState createState() => MainSignupBusinessState();
 }
 
-class MainSignupState extends State<MainSignup> {
+class MainSignupBusinessState extends State<MainSignupBusiness> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _auth = FirebaseAuth.instance;
-  final _customerService = CustomersService();
+  final _businessService = BusinessService();
   bool _isLoading = false;
 
   Future<void> _register() async {
@@ -38,17 +38,13 @@ class MainSignupState extends State<MainSignup> {
       );
       final user = userCredential.user;
       if (user == null) throw FirebaseAuthException(code: 'user-null');
-
-      await _customerService.createCustomerForUser(
+      await _businessService.createBusinessForUser(
         userId: user.uid,
         name: _nameController.text.trim(),
         lastName: _lastNameController.text.trim(),
         email: _emailController.text.trim(),
       );
-
       await user.sendEmailVerification();
-      await FirebaseAuth.instance.signOut();
-
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

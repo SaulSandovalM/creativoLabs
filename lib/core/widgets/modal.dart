@@ -56,15 +56,12 @@ class Modal extends StatelessWidget {
         const SizedBox(height: 8),
         _buildDetailRow('Cliente', orderData['customerName'] ?? 'N/A'),
         _buildDetailRow(
-            'Dirección',
-            orderData['address'] +
-                    ',\n' +
-                    orderData['city'] +
-                    ',\n' +
-                    orderData['state'] +
-                    ',\n' +
-                    orderData['cp'] ??
-                'N/A'),
+          'Dirección',
+          '${orderData['address'] ?? 'N/A'},\n'
+              '${orderData['city'] ?? 'N/A'},\n'
+              '${orderData['state'] ?? 'N/A'},\n'
+              '${orderData['cp'] ?? 'N/A'}',
+        ),
         _buildDetailRow('Fecha', orderData['date'] ?? 'N/A'),
         _buildDetailRow('Estado', orderData['status'] ?? 'N/A'),
         _buildDetailRow('Método de Pago', orderData['paymentMethod'] ?? 'N/A'),

@@ -132,4 +132,38 @@ class ServiceService {
 
     return nearby;
   }
+
+  // Método para obtener los servicios y agruparlos por categoría
+  Future<Map<String, List<Map<String, dynamic>>>>
+      getGroupedServicesByCategory() async {
+    try {
+      // Obtener todos los servicios de la base de datos
+      final snapshot =
+          await FirebaseFirestore.instance.collectionGroup('services').get();
+
+      // Crear un mapa para agrupar los servicios por categorías
+      final Map<String, List<Map<String, dynamic>>> groupedServices = {};
+
+      // Iterar sobre todos los servicios
+      for (var doc in snapshot.docs) {
+        final servicio = doc.data();
+        final categories = List<String>.from(servicio['category'] ?? []);
+
+        // Iterar sobre cada categoría de un servicio
+        for (var category in categories) {
+          // Si no existe la categoría en el mapa, la agregamos
+          if (!groupedServices.containsKey(category)) {
+            groupedServices[category] = [];
+          }
+
+          // Añadimos el servicio a su categoría correspondiente
+          groupedServices[category]!.add(servicio);
+        }
+      }
+
+      return groupedServices;
+    } catch (e) {
+      throw Exception('Error al obtener los servicios agrupados: $e');
+    }
+  }
 }
