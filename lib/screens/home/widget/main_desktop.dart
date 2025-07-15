@@ -52,7 +52,6 @@ class MainDesktopState extends State<MainDesktop> {
 
   void _navigateToSearch(String query) {
     if (query.isNotEmpty) {
-      debugPrint('Navegando a: /search/${Uri.encodeComponent(query)}');
       context.go('/search/${Uri.encodeComponent(query)}');
     }
   }

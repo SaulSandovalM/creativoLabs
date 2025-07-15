@@ -79,9 +79,11 @@ class _ServicesCategoriesState extends State<ServicesCategories> {
                         itemBuilder: (context, index) {
                           final s = servicios[index];
                           return InfluencerCard(info: {
-                            'nombre': s['name'] ?? 'Sin nombre',
-                            'descripcion': s['description'] ?? '',
-                            'categoria':
+                            'businessId': s['businessId'] ?? 'No tiene id',
+                            'name': s['name'] ?? 'Sin nombre',
+                            'description': s['description'] ?? '',
+                            'price': s['price'] ?? '',
+                            'category':
                                 (s['category'] as List<dynamic>?)?.join(', ') ??
                                     'GENERAL',
                             'usuario': s['owner'] ?? '@usuario',

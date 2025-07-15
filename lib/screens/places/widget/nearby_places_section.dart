@@ -70,9 +70,11 @@ class _NearbyPlacesSectionState extends State<NearbyPlacesSection> {
                 itemBuilder: (context, index) {
                   final servicio = data[index];
                   return InfluencerCard(info: {
-                    'nombre': servicio['name'] ?? 'Sin nombre',
-                    'descripcion': servicio['description'] ?? '',
-                    'categoria':
+                    'businessId': servicio['businessId'] ?? 'sin id',
+                    'name': servicio['name'] ?? 'Sin nombre',
+                    'price': servicio['price'] ?? 'SIn precio',
+                    'description': servicio['description'] ?? '',
+                    'category':
                         (servicio['category'] as List<dynamic>?)?.join(', ') ??
                             'GENERAL',
                     'usuario': servicio['owner'] ?? '@usuario',

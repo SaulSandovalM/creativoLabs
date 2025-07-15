@@ -70,17 +70,16 @@ class _MainCreateOrderState extends State<MainCreateOrder> {
   ];
 
   final _priceController = TextEditingController();
-  final TextEditingController _orderNumberController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _secondLastNameController =
-      TextEditingController();
-  final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _timeController = TextEditingController();
-  final TextEditingController _cityController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _cpController = TextEditingController();
-  final TextEditingController _noteController = TextEditingController();
+  final _orderNumberController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _secondLastNameController = TextEditingController();
+  final _dateController = TextEditingController();
+  final _timeController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _cpController = TextEditingController();
+  final _noteController = TextEditingController();
 
   final SalesService _salesService = SalesService();
   final ServiceService _serviceService = ServiceService();
