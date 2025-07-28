@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 class ServiceService {
   final CollectionReference servicesRef =
@@ -75,22 +75,84 @@ class ServiceService {
   }
 
   // Buscar todos los servicios por categoría
-  Stream<List<Map<String, dynamic>>> searchAllServicesByCategory(
-      String category) {
-    return FirebaseFirestore.instance
+  Future<List<Map<String, dynamic>>> searchAllServicesByCategoryFuture(
+      String query) async {
+    final snapshot = await FirebaseFirestore.instance
         .collectionGroup('services')
-        .where('category', arrayContains: category)
-        .snapshots()
-        .map((snapshot) {
-      debugPrint('Snapshot data: ${snapshot.docs.length} documents found.');
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        data['id'] = doc.id;
-        return data;
-      }).toList();
-    }).handleError((error, stackTrace) {
-      debugPrint('Error en searchAllServicesByCategory: $error');
-      debugPrint('StackTrace: $stackTrace');
-    });
+        .where('category', arrayContains: query)
+        .get();
+    return snapshot.docs.map((doc) => doc.data()).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getLast4GlobalServices() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collectionGroup('services')
+        .orderBy('createdAt', descending: true)
+        .limit(4)
+        .get();
+
+    return snapshot.docs.map((doc) => doc.data()).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getNearbyServices(Position userPos,
+      {double radiusKm = 10}) async {
+    final snapshot =
+        await FirebaseFirestore.instance.collectionGroup('services').get();
+
+    final nearby = snapshot.docs
+        .where((doc) {
+          final data = doc.data();
+          final lat = data['lat'];
+          final lng = data['lng'];
+
+          if (lat == null || lng == null) return false;
+
+          final distance = Geolocator.distanceBetween(
+            userPos.latitude,
+            userPos.longitude,
+            lat,
+            lng,
+          );
+
+          return distance <= radiusKm * 1000; // Convertimos a metros
+        })
+        .map((doc) => doc.data())
+        .toList();
+
+    return nearby;
+  }
+
+  // Método para obtener los servicios y agruparlos por categoría
+  Future<Map<String, List<Map<String, dynamic>>>>
+      getGroupedServicesByCategory() async {
+    try {
+      // Obtener todos los servicios de la base de datos
+      final snapshot =
+          await FirebaseFirestore.instance.collectionGroup('services').get();
+
+      // Crear un mapa para agrupar los servicios por categorías
+      final Map<String, List<Map<String, dynamic>>> groupedServices = {};
+
+      // Iterar sobre todos los servicios
+      for (var doc in snapshot.docs) {
+        final servicio = doc.data();
+        final categories = List<String>.from(servicio['category'] ?? []);
+
+        // Iterar sobre cada categoría de un servicio
+        for (var category in categories) {
+          // Si no existe la categoría en el mapa, la agregamos
+          if (!groupedServices.containsKey(category)) {
+            groupedServices[category] = [];
+          }
+
+          // Añadimos el servicio a su categoría correspondiente
+          groupedServices[category]!.add(servicio);
+        }
+      }
+
+      return groupedServices;
+    } catch (e) {
+      throw Exception('Error al obtener los servicios agrupados: $e');
+    }
   }
 }

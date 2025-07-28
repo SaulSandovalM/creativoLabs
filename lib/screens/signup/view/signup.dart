@@ -10,7 +10,7 @@ class SignUp extends StatelessWidget {
     return const MainContainer(
       child: Column(
         children: [
-          MainSignUp(headerHeight: 60),
+          MainSignup(),
           SizedBox(height: 40),
         ],
       ),

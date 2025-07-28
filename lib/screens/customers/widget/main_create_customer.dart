@@ -100,9 +100,9 @@ class _MainCreateCustomerState extends State<MainCreateCustomer> {
           'phoneNumber': _phoneController.text,
           'company': _companyController.text,
           'status': 'Activo',
-          'estado': estadoSeleccionado,
-          'ciudad': _cityController.text,
-          'direccion': _addressController.text,
+          'state': estadoSeleccionado,
+          'city': _cityController.text,
+          'address': _addressController.text,
           'cp': _cpController.text,
         },
       );

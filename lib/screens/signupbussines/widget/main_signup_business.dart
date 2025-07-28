@@ -1,73 +1,30 @@
-import 'package:creativolabs/api/customers_service.dart';
 import 'package:creativolabs/core/constants/colors.dart';
 import 'package:creativolabs/core/widgets/button.dart';
 import 'package:creativolabs/core/widgets/container.dart';
+import 'package:creativolabs/api/business_service.dart';
 import 'package:creativolabs/core/widgets/input.dart';
-import 'package:creativolabs/core/widgets/select.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
-class MainSignup extends StatefulWidget {
-  const MainSignup({super.key});
+class MainSignupBusiness extends StatefulWidget {
+  final double headerHeight;
+
+  const MainSignupBusiness({super.key, required this.headerHeight});
 
   @override
-  MainSignupState createState() => MainSignupState();
+  MainSignupBusinessState createState() => MainSignupBusinessState();
 }
 
-class MainSignupState extends State<MainSignup> {
-  String? stateSelected;
-
-  List<String> estados = [
-    'Aguascalientes',
-    'Baja California',
-    'Baja California Sur',
-    'Campeche',
-    'Chiapas',
-    'Chihuahua',
-    'Ciudad de México',
-    'Coahuila',
-    'Colima',
-    'Durango',
-    'Estado de México',
-    'Guanajuato',
-    'Guerrero',
-    'Hidalgo',
-    'Jalisco',
-    'Michoacán',
-    'Morelos',
-    'Nayarit',
-    'Nuevo León',
-    'Oaxaca',
-    'Puebla',
-    'Querétaro',
-    'Quintana Roo',
-    'San Luis Potosí',
-    'Sinaloa',
-    'Sonora',
-    'Tabasco',
-    'Tamaulipas',
-    'Tlaxcala',
-    'Veracruz',
-    'Yucatán',
-    'Zacatecas'
-  ];
-
+class MainSignupBusinessState extends State<MainSignupBusiness> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _lastNameController = TextEditingController();
-  final _secondLastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _cityController = TextEditingController();
-  final _addressController = TextEditingController();
-  final _cpController = TextEditingController();
   final _auth = FirebaseAuth.instance;
-  final _customerService = CustomersService();
-  final _phoneController = TextEditingController();
-
+  final _businessService = BusinessService();
   bool _isLoading = false;
 
   Future<void> _register() async {
@@ -81,25 +38,13 @@ class MainSignupState extends State<MainSignup> {
       );
       final user = userCredential.user;
       if (user == null) throw FirebaseAuthException(code: 'user-null');
-
-      await _customerService.createCustomerForUser(
+      await _businessService.createBusinessForUser(
         userId: user.uid,
         name: _nameController.text.trim(),
         lastName: _lastNameController.text.trim(),
-        secondLastName: _secondLastNameController.text.trim(),
         email: _emailController.text.trim(),
-        phoneNumber: _phoneController.text.trim(),
-        company: '',
-        status: 'Activo',
-        state: stateSelected,
-        city: _cityController.text.trim(),
-        address: _addressController.text.trim(),
-        cp: _cpController.text.trim(),
       );
-
       await user.sendEmailVerification();
-      await FirebaseAuth.instance.signOut();
-
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -121,8 +66,12 @@ class MainSignupState extends State<MainSignup> {
 
   @override
   Widget build(BuildContext context) {
+    final availableHeight =
+        MediaQuery.of(context).size.height - widget.headerHeight;
+
     return MainContainer(
       child: SizedBox(
+        height: availableHeight,
         width: double.infinity,
         child: Row(
           children: [
@@ -159,31 +108,7 @@ class MainSignupState extends State<MainSignup> {
                           Expanded(
                             child: Input(
                               controller: _lastNameController,
-                              label: 'Primer Apellido',
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 40),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Input(
-                              controller: _secondLastNameController,
-                              label: 'Segundo Apellido',
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Input(
-                              controller: _phoneController,
-                              label: 'Teléfono',
-                              keyboardType: TextInputType.number,
-                              minLength: 10,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                                LengthLimitingTextInputFormatter(10),
-                              ],
+                              label: 'Apellido',
                             ),
                           ),
                         ],
@@ -209,68 +134,6 @@ class MainSignupState extends State<MainSignup> {
                         label: 'Contraseña',
                         obscureText: true,
                         minLength: 6,
-                      ),
-                      const SizedBox(height: 40),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Select<String>(
-                              value: stateSelected,
-                              items: estados.map((String estado) {
-                                return DropdownMenuItem<String>(
-                                  value: estado,
-                                  child: Text(estado),
-                                );
-                              }).toList(),
-                              decoration: const InputDecoration(
-                                labelText: 'Estado',
-                                border: OutlineInputBorder(),
-                              ),
-                              onChanged: (String? nuevoEstado) {
-                                setState(() {
-                                  stateSelected = nuevoEstado;
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Por favor seleccione un estado';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Input(
-                              controller: _cityController,
-                              label: 'Ciudad',
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 40),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Input(
-                              controller: _addressController,
-                              label: 'Dirección',
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Input(
-                              controller: _cpController,
-                              label: 'CP',
-                              keyboardType: TextInputType.number,
-                              minLength: 5,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                                LengthLimitingTextInputFormatter(5),
-                              ],
-                            ),
-                          ),
-                        ],
                       ),
                       const SizedBox(height: 40),
                       Row(

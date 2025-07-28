@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class CustomersService {
   final CollectionReference customersRef =
       FirebaseFirestore.instance.collection('business');
+  final CollectionReference userRef =
+      FirebaseFirestore.instance.collection('users');
 
   // Obtener clientes de un negocio específico
   Stream<QuerySnapshot> getCustomersStreamByBusiness(String businessId) {
@@ -89,4 +91,50 @@ class CustomersService {
         customersRef.doc(businessId).collection('customers').doc(customerId);
     await docRef.update(customerData);
   }
+
+  Future<void> createCustomerForUser({
+    required String userId,
+    required String name,
+    required String lastName,
+    required String secondLastName,
+    required String email,
+    required String phoneNumber,
+    required String company,
+    required String status,
+    required String? state,
+    required String city,
+    required String address,
+    required String cp,
+  }) async {
+    await userRef.doc(userId).set({
+      'name': name,
+      'lastName': lastName,
+      'secondLastName': secondLastName,
+      'phoneNumber': phoneNumber,
+      'email': email,
+      'company': company,
+      'status': status,
+      'state': state,
+      'city': city,
+      'address': address,
+      'cp': cp,
+      'role': 'customer',
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  // Future<String?> getCustomerIdByUser() async {
+  //   final uid = FirebaseAuth.instance.currentUser?.uid;
+  //   if (uid == null) return null;
+
+  //   final doc = await userRef.doc(uid).get();
+
+  //   if (doc.exists) {
+  //     debugPrint('Customer encontrado: ${doc.id}');
+  //     return doc.id;
+  //   }
+
+  //   debugPrint('No se encontró customer para UID: $uid');
+  //   return null;
+  // }
 }

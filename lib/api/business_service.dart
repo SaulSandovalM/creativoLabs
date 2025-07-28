@@ -30,6 +30,7 @@ class BusinessService {
       'lastName': lastName,
       'email': email,
       'businessId': businessId,
+      'role': 'business',
       'createdAt': FieldValue.serverTimestamp(),
     });
   }

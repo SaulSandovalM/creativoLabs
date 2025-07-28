@@ -1,5 +1,5 @@
 import 'package:creativolabs/core/widgets/back_buttons.dart';
-import 'package:creativolabs/core/widgets/container.dart';
+import 'package:creativolabs/core/widgets/detail_container.dart';
 import 'package:creativolabs/screens/createorder/widget/main_create_order.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -18,19 +18,20 @@ class Createorder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MainContainer(
+    return DetailContainer(
       child: Column(
         children: [
           SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   BackButtons(
-                    title: 'Crear Orden',
-                    onPressed: () => context.go('/sales'),
+                    title: '',
+                    onPressed: () => context.pop(),
                     icon: Icons.arrow_back,
                   ),
                   SizedBox(height: 30),
